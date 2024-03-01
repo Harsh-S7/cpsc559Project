@@ -1,0 +1,32 @@
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding-top: 10rem;
+}
+
+.text-area-container {
+    height: 30%;
+    width: 50%;
+}
+  
+.text-area {
+    height: 300px;
+    width: 100%;
+}
+
+.insert-string, .remove-string, .get-string {
+    margin: 2rem 0;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.insert-string > * {
+    margin: auto;
+}
