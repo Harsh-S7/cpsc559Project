@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  backend:
+    image: hoxirious/node:latest
+    working_dir: /app/server
+    build: ./server/
+    volumes:
+      - ./server:/app/server
+      - /app/server/node_modules
+    ports:
+      - "3000:3000"
+    command: pnpm start:docker
+    # deploy:
+    #   replicas: 3
+    #   placement:
+    #     constraints:
+    #       - "node.role == manager"
+
+  frontend:
+      image: hoxirious/node:latest
+      working_dir: /app/client
+      build: ./client/
+      volumes:
+        - ./client:/app/client
+        - /app/client/node_modules
+      ports:
+        - "5173:5173"
+      command: "pnpm dev"
