@@ -31,4 +31,10 @@ cd server && pnpm i && pnpm build && pnpm dev
 - Proxy is a messager broker that will decide where the destination of an request. This ensures transparency
 - However, proxy will be our bottleneck because if it crashed, the whole system is down.
 - Correctness: Integrate Docker Swarm - automatic fault tolerance to the proxy. If it crashes, Docker Engine will detect and its backup replication will replace and spawn new replication.
+![image](https://github.com/Harsh-S7/cpsc559Project/assets/65211251/2ea7745f-d341-41ab-8c37-13dceaf9f48c)
+
+- On production, we should not run server replications and proxy on the same machine. Eventually, everything must be distributed.
+![image](https://github.com/Harsh-S7/cpsc559Project/assets/65211251/1f80d766-3b7b-4183-9e19-2faafe37066b)
+
+
 
