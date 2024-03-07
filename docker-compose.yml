@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  proxy:
+    image: hoxirious/node:latest
+    working_dir: /app/proxy
+    build: ./proxy/
+    volumes:
+      - ./proxy:/app/proxy
+      - /app/proxy/node_modules
+    ports:
+      - "3000:3000"
+    command: pnpm start:docker
+    depends_on:
+      - backend
+
   backend:
     image: hoxirious/node:latest
     working_dir: /app/server
@@ -9,7 +22,8 @@ services:
       - ./server:/app/server
       - /app/server/node_modules
     ports:
-      - "3000:3000"
+      - "3001:3001"
+      - "3002:3002"
     command: pnpm start:docker
     # deploy:
     #   replicas: 3

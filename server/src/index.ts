@@ -1,6 +1,7 @@
 // src/index.js
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import { seedString } from "./definitions/placeholder.definition";
 
 const BASE_URL = "/api";
@@ -8,8 +9,9 @@ const BASE_URL = "/api";
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
-app.use(express.json());
+const port = process.env.PORT || 3001;
+const port2 = process.env.PORT || 3002;
+app.use(express.json(), cors());
 
 var mstring = seedString
 
@@ -38,4 +40,8 @@ app.post(`${BASE_URL}/removeString/`, removeString);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
+});
+
+app.listen(port2, () => {
+  console.log(`[server]: Server is running at http://localhost:${port2}`);
 });

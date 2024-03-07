@@ -1,4 +1,4 @@
-FROM node:latest
+FROM hoxirious/node:latest
 
 RUN npm i -g pnpm
 # Set the working directory in the container
@@ -6,7 +6,7 @@ RUN npm i -g pnpm
 WORKDIR /app/server
 
 # Copy the package.json and package-lock.json files to the container
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml tsconfig.json ./
 
 # Install dependencies
 RUN pnpm install
@@ -14,10 +14,11 @@ RUN pnpm install
 # Copy the rest of the application code to the container
 COPY . .
 
-# RUN npm run build
+RUN npm run build
 
-# Expose port 8000
-EXPOSE 3000
+# Expose port 3001 and 3002
+EXPOSE 3001
+EXPOSE 3002
 
 # Command to run the application
 CMD ["pnpm", "start"]
