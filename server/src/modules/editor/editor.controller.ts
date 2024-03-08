@@ -19,7 +19,7 @@ editor.get("/document/:id", (req: Request, res: Response) => {
 editor.get("/hash/:id", (req: Request, res: Response) => {
   const id = Number(req.params.id);
   res.send(MDEService.getHash(id));
-})
+});
 //editor.post('/insertString/:id', (req: Request, res: Response) => {
 //  const b = req.body
 //  mstring = mstring.slice(0, b.index) + b.string + mstring.slice(b.index);
@@ -37,4 +37,3 @@ editor.post("/document/:id", (req: Request, res: Response) => {
   const doc = MDEService.modifyDocument(id, req.body);
   res.status(200).send(doc);
 });
-

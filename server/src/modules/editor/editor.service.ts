@@ -1,6 +1,6 @@
 import { MDEDocument } from "../../definitions/document-md.definition";
 import { MDERepository } from "./editor.repository";
-import * as crypto from 'crypto';
+import * as crypto from "crypto";
 
 export class MDEService {
   static createDocument(doc: MDEDocument) {
@@ -11,11 +11,11 @@ export class MDEService {
     return newDoc;
   }
 
-  static getHash(id: number) : string {
-    const shasum = crypto.createHash('sha1');
+  static getHash(id: number): string {
+    const shasum = crypto.createHash("sha1");
     const doc = MDERepository.getDocument(id);
     shasum.update(doc.content);
-    return shasum.digest('hex');
+    return shasum.digest("hex");
   }
 
   static getDocument(id: number) {
