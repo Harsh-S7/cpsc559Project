@@ -1,5 +1,6 @@
 ## Setup
 
+### Run without Docker
 - To install and run client
 ```
 cd client && pnpm i && pnpm dev
@@ -15,6 +16,31 @@ cd proxy && pnpm i && pnpm build && pnpm dev
 cd server && pnpm i && pnpm build && pnpm dev
 ```
 
+### Run with Docker
+Rerequisite: docker
+- To run all containers with compose:
+```
+docker compose up --build
+```
+- To bring down all containers:
+```
+docker compose down --volumes
+```
+
+- To initialize the Docker Swarm
+- To deploy stack
+```
+sudo docker stack deploy --compose-file docker-compose.yml stackdemo
+```
+- To list running stack
+```
+docker stack ls
+```
+```
+docker stack ps stackdemo
+```
+
+
 ## Workflow
 
 > Note: Curently, only /api/mstring has been implemented
@@ -24,7 +50,7 @@ cd server && pnpm i && pnpm build && pnpm dev
 - Proxy checks if primary server is running
 + Case running then forward to Primary Server
 + Case down then check Secondary Server running and forward to it.
-- If both case down, then send server down endpoint
+- If both case down, then send server-down endpoint
 
 ## Architecture
 
