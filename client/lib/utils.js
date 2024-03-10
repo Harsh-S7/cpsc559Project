@@ -1,7 +1,7 @@
 const BASE_URL = '/api';
 
 export const getString = async () => {
-    const response = await fetch(`http://localhost:3000${BASE_URL}/mstring`, {
+    const response = await fetch(`${BASE_URL}/mstring`, {
         method: 'GET',
     });
     console.log(response);
@@ -10,7 +10,7 @@ export const getString = async () => {
 }
 
 export const insertString = async (index, string) => {
-    const response = await fetch(`http://localhost:3000${BASE_URL}/insertString`, {
+    const response = await fetch(`${BASE_URL}/insertString`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -23,7 +23,7 @@ export const insertString = async (index, string) => {
 }
 
 export const removeString = async (startIndex, endIndex) => {
-    const response = await fetch(`http://localhost:3000${BASE_URL}/removeString`, {
+    const response = await fetch(`${BASE_URL}/removeString`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

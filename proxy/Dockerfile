@@ -6,11 +6,10 @@ RUN npm i -g pnpm
 WORKDIR /app/proxy
 
 # Copy the package.json and package-lock.json files to the container
-COPY package.json pnpm-lock.yaml tsconfig.json ./
+COPY package.json tsconfig.json ./
 
 # Install dependencies
 RUN pnpm install
-
 # Copy the rest of the application code to the container
 COPY . .
 

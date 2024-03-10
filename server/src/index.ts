@@ -38,10 +38,14 @@ app.get(`${BASE_URL}/mstring/`, getString);
 app.post(`${BASE_URL}/insertString/`, insertString);
 app.post(`${BASE_URL}/removeString/`, removeString);
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World");
 });
 
-app.listen(port2, () => {
-  console.log(`[server]: Server is running at http://localhost:${port2}`);
-});
+// app.listen(port, () => {
+//   console.log(`[server]: Server is running at http://localhost:${port}`);
+// });
+
+// app.listen(port2, () => {
+//   console.log(`[server]: Server is running at http://localhost:${port2}`);
+// });

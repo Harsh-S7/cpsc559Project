@@ -1,5 +1,5 @@
 // src/index.js
-import express, { Express, Request, Response } from "express";
+import express, { Express, Request, Response, NextFunction, RequestHandler } from "express";
 import dotenv from "dotenv";
 import proxy from "express-http-proxy";
 import cors from "cors";
@@ -10,38 +10,43 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 
-
-async function selectProxyHost(param:string) {
-  console.log("Selecting proxy host");
-  const response = await fetch("http://localhost:3001/api/mstring");
-  if (!response.ok) {
-    console.log("Primary server is down");
-    // Refresh primary server.
-    // redirect to secondary server
-    const response = await fetch("http://localhost:3002/api/mstring");
-
-    if (!response.ok) {
-      // Both servers are down
-      console.log("Both servers are down");
-      return "http://localhost:3000/server-down";
-    }
-    console.log("Secondary server is up");
-    return `http://localhost:3002/api/${param}`;
-  }
-  console.log("Primary server is up");
-  return `http://localhost:3001/api/${param}`;
-
-}
 app.use(express.json(), cors());
+// Primary server URL
+const primaryServerUrl = 'http://backend:3001';
+// Secondary server URL
+const secondaryServerUrl = 'http://backend:3002';
 
-app.use("/api/:endpoint", cors(), proxy("http://localhost:3001/api/", {
-  proxyReqPathResolver: async function(req: Request ) {
-    const param = req.params.endpoint; 
-    const response = await selectProxyHost(param);
-    return response;
-  }
-}));
+
+// Function to create a proxy middleware
+function createProxy(target: string): RequestHandler {
+  return proxy(target, {
+    proxyReqPathResolver: async function(req: Request) {
+      const param = req.params.endpoint;
+      return `${target}/api/${param}`;
+    },
+    proxyErrorHandler: function(err, res, next) {
+      console.error('Primary server error:', err);
+      // If there's an error with the primary server, switch to the secondary server
+      if (target === primaryServerUrl) {
+        console.log('Switching to secondary server...');
+        return createProxy(secondaryServerUrl)(res.req, res, next);
+      }
+      // If already switched to secondary and still error, proceed with error handling
+      return next(err);
+    }
+  });
+}
+
+const proxyMiddleware = createProxy(primaryServerUrl);
+
+app.use('/api/:endpoint', (req: Request, res: Response, next: NextFunction) => {
+  proxyMiddleware(req, res, next);
+},cors());
+
+app.get("/server-down", (req: Request, res: Response) => {
+  res.status(500).send("Servers are down");
+});
 
 app.listen(port, () => {
-  console.log(`[proxy]: Proxy is running at http://localhost:${port}`);
+  console.log(`[proxy]: Proxy is running at http://backend:${port}`);
 });

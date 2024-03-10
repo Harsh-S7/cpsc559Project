@@ -6,7 +6,7 @@ RUN npm i -g pnpm
 WORKDIR /app/client
 
 # Copy the package.json and package-lock.json files to the container
-COPY package.json ./
+COPY package.json pnpm-lock.yaml vite.config.js ./
 
 # Install dependencies
 RUN pnpm install
