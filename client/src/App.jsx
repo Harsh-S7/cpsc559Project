@@ -10,7 +10,7 @@ const App = () => {
       <BrowserRouter>
         <Routes>  
           <Route path="/" element={<Form />} />
-          <Route path="/editor" element={<SharedDocumentComponent />} />
+          <Route path="/editor/:docId" element={<SharedDocumentComponent />} />
         </Routes>
       </BrowserRouter>
     </div>

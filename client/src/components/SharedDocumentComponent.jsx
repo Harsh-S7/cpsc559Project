@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-// Import other necessary modules based on your application's needs
+import { useParams } from 'react-router-dom'; // Import useParams
 
-const SharedDocumentComponent = ({ docName }) => {
-  docName = docName || 'defaultDoc'; // Default document name
+const SharedDocumentComponent = () => {
+  // Use useParams to directly extract URL parameters
+  const { docId } = useParams();
+  const docName = docId || 'defaultDoc'; // Use docId from URL or default
   const [doc, setDoc] = useState(null);
   const [content, setContent] = useState('');
 
@@ -30,7 +32,7 @@ const SharedDocumentComponent = ({ docName }) => {
       wsProvider.destroy();
       ydoc.destroy();
     };
-  }, [docName]);
+  }, [docName]); // Dependency array includes docName
 
   // Function to update the shared document, e.g., on user input
   const updateDocument = (newContent) => {
