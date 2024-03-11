@@ -11,6 +11,9 @@ const wsReadyStateOpen = 1;
 const wsReadyStateClosing = 2; // eslint-disable-line
 const wsReadyStateClosed = 3; // eslint-disable-line
 
+// WebSocket: ws://localhost:3000
+// API: ws://localhost:3000/api/user?username="hy"&password="123"
+
 // disable gc when using snapshots!
 const gcEnabled = process.env.GC !== 'false' && process.env.GC !== '0';
 

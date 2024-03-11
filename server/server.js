@@ -9,6 +9,8 @@ const { setPersistence, setupWSConnection } = require('./websocket/utils.js');
 // Create an instance of Express
 const app = express();
 
+// API: login user, logout, share documents, getCurrentUsersDocuments
+
 // Use Express to handle JSON and URL-encoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,6 +22,8 @@ app.get('/api/status', (req, res) => {
 
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
+
+// BELOW IS SET UP THE YJS WEBSOCKET FOR DOCUMENT EDITING
 
 // Existing code for WebSocket server setup
 const wss = new WebSocketServer({ server });
@@ -39,17 +43,17 @@ collectionName: 'documents',
 setPersistence({
   bindState: async (docName, ydoc) => {
     const persistedYdoc = await mdb.getYDoc(docName);
-    const newUpdates = Y.encodeStateAsUpdate(ydoc);
-    mdb.storeUpdate(docName, newUpdates);
-    Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
+    const newUpdates = Y.encodeStateAsUpdate(ydoc); // Insert or Delete
+    mdb.storeUpdate(docName, newUpdates); // Stores it in the datbase
+    Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc)); // applies the db to the doc on the server
     ydoc.on('update', async (update) => {
       mdb.storeUpdate(docName, update);
-    });
+    }); // Listens for updates and stores them in the db
   },
   writeState: () => {
     return new Promise((resolve) => {
       resolve(true);
-    });
+    }); // This promise sends the state to all the clients
   },
 });
 

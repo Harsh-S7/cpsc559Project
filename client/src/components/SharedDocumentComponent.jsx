@@ -1,40 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
-import { useParams } from 'react-router-dom'; // Import useParams
+import { useParams } from 'react-router-dom';
 
 const SharedDocumentComponent = () => {
-  // Use useParams to directly extract URL parameters
   const { docId } = useParams();
-  const docName = docId || 'defaultDoc'; // Use docId from URL or default
+  const docName = docId || 'defaultDoc';
   const [doc, setDoc] = useState(null);
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    // Initialize Y.Doc
     const ydoc = new Y.Doc();
     const wsProvider = new WebsocketProvider('ws://localhost:3000', docName, ydoc);
-
-    // Initialize shared types (e.g., Y.Text)
     const ytext = ydoc.getText('sharedText');
-    setDoc(ydoc); // Save Y.Doc for further use
+    setDoc(ydoc);
 
-    // Listen to changes in the shared text
     ytext.observe(event => {
       setContent(ytext.toString());
     });
 
-    // Initial content update
     setContent(ytext.toString());
 
-    // Clean up on component unmount
     return () => {
       wsProvider.destroy();
       ydoc.destroy();
     };
-  }, [docName]); // Dependency array includes docName
+  }, [docName]);
 
-  // Function to update the shared document, e.g., on user input
   const updateDocument = (newContent) => {
     if (doc) {
       const ytext = doc.getText('sharedText');
@@ -44,12 +36,12 @@ const SharedDocumentComponent = () => {
   };
 
   return (
-    <div>
-      <h2>Shared Document: {docName}</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>Document Name: {docName}</h2>
       <textarea
         value={content}
         onChange={(e) => updateDocument(e.target.value)}
-        style={{ width: '100%', height: '200px' }}
+        style={{ width: '95%', height: '400px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
       />
     </div>
   );
