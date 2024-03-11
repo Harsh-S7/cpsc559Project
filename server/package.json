@@ -16,6 +16,7 @@
     "http": "^0.0.1-security",
     "mongodb": "^6.4.0",
     "nodemon": "^3.1.0",
+    "pm2": "^5.3.1",
     "ws": "^8.16.0",
     "y-mongodb-provider": "^0.1.9",
     "y-websocket": "^1.5.4",
