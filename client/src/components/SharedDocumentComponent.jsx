@@ -3,6 +3,7 @@ import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { useParams } from 'react-router-dom';
 
+
 const SharedDocumentComponent = () => {
   const { docId } = useParams();
   const docName = docId || 'defaultDoc';
@@ -11,7 +12,7 @@ const SharedDocumentComponent = () => {
 
   useEffect(() => {
     const ydoc = new Y.Doc();
-    const wsProvider = new WebsocketProvider('ws://localhost:3000', docName, ydoc);
+    const wsProvider = new WebsocketProvider(`ws://backend:3001`, docName, ydoc);
     const ytext = ydoc.getText('sharedText');
     setDoc(ydoc);
 

@@ -6,15 +6,13 @@ RUN npm i -g pnpm
 WORKDIR /app/server
 
 # Copy the package.json and package-lock.json files to the container
-COPY package.json pnpm-lock.yaml tsconfig.json ./
+COPY package.json nodemon.json ./
 
 # Install dependencies
 RUN pnpm install
 
 # Copy the rest of the application code to the container
 COPY . .
-
-RUN npm run build
 
 # Expose port 3001 and 3002
 EXPOSE 3001

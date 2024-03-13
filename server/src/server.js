@@ -28,10 +28,14 @@ const server = http.createServer(app);
 // Existing code for WebSocket server setup
 const wss = new WebSocketServer({ server });
 wss.on('connection', setupWSConnection);
+console.log('WebSocket server is listening');
 
 // y-mongodb-provider setup
 if (!process.env.MONGO_URL) {
   throw new Error('Please define the MONGO_URL environment variable');
+}
+else {
+    console.log('MONGO_URL is defined');
 }
 
 const mdb = new MongodbPersistence(process.env.MONGO_URL, {
