@@ -1,5 +1,4 @@
 {
-  "watch": ["src"],
-  "ext": "ts",
-  "exec": "concurrently \"npx tsc --watch\" \"ts-node src/index.ts\""
+  "watch": ["src","websocket"],
+  "ext": "js",
 }
