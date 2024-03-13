@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { seedString } from "../../definitions/placeholder.definition";
- 
+
 export const editor = Router();
 // placeholder string
 var mstring = seedString
