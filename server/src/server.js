@@ -4,7 +4,7 @@ const express = require('express');
 const WebSocketServer = require('ws').Server;
 const Y = require('yjs');
 const { MongodbPersistence } = require('y-mongodb-provider');
-const { setPersistence, setupWSConnection } = require('./websocket/utils.js');
+const { setPersistence, setupWSConnection } = require('../websocket/utils.js');
 
 // Create an instance of Express
 const app = express();

@@ -1,4 +1,4 @@
 {
   "watch": ["src","websocket"],
-  "ext": "js",
+  "ext": "js"
 }
