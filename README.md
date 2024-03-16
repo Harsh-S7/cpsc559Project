@@ -13,7 +13,7 @@ cd proxy && pnpm i && pnpm build && pnpm dev
 
 - To install and run server
 ```
-cd server && pnpm i && pnpm build && pnpm dev
+cd server && pnpm i && pnpm dev
 ```
 
 ### Run with Docker
