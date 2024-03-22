@@ -14,26 +14,44 @@ services:
       - "3000:3000"
     command: pnpm start:docker
     depends_on:
-      - backend
+      - backend-editor
+      - backend-user
 
-  backend:
+  backend-editor:
     image: hoxirious/node:latest
-    working_dir: /app/server
+    working_dir: /app/server-editor
     build:
       context: ./server/
       dockerfile: Dockerfile
     volumes:
-      - ./server:/app/server
-      - /app/server/node_modules
+      - ./server:/app/server-editor
+      - /app/server-editor/node_modules
     ports:
       - "3001:3001"
       - "3002:3002"
     command: pnpm start:docker
+    depends_on:
+      - mongodb
     # deploy:
     #   replicas: 3
     #   placement:
     #     constraints:
     #       - "node.role == manager"
+
+  backend-user:
+    image: hoxirious/node:latest
+    working_dir: /app/server-user
+    build:
+      context: ./http-server/
+      dockerfile: Dockerfile
+    volumes:
+      - ./http-server:/app/server-user
+      - /app/server-user/node_modules
+    ports:
+      - "3003:3003"
+    command: pnpm start:docker
+    depends_on:
+      - mongodb
 
   mongodb:
     image: "mongo"
@@ -51,12 +69,10 @@ services:
       MONGO_INITDB_DATABASE: cpsc559
     env_file:
       - .env
-    depends_on:
-      - backend
 
 
   frontend:
-      image: hoxirious/node:latest
+      image: node:latest
       working_dir: /app/client
       build:
         context: ./client/
@@ -67,6 +83,8 @@ services:
       ports:
         - "5173:5173"
       command: "pnpm dev"
+      depends_on:
+        - proxy
 
 volumes:
   mongodb_data:
