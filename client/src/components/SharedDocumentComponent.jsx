@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { useParams } from 'react-router-dom';
+import MDEditor from '@uiw/react-md-editor';
 
 
 const SharedDocumentComponent = () => {
@@ -44,6 +45,12 @@ const SharedDocumentComponent = () => {
         onChange={(e) => updateDocument(e.target.value)}
         style={{ width: '95%', height: '400px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
       />
+      {/* <MDEditor
+        value={content}
+        onChange={setContent}
+        style={{ width: '95%', height: '1000px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+      />
+      <MDEditor.Markdown source={content} style={{ whiteSpace: 'pre-wrap', display: 'none' }} /> */}
     </div>
   );
 };

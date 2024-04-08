@@ -10,12 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
+    "@mdi/js": "^7.4.47",
+    "@mdi/react": "^1.6.1",
+    "@uiw/react-md-editor": "^4.0.4",
     "framer-motion": "^11.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-md-icon": "^1.13.0",
+    "react-router": "^6.22.3",
     "react-router-dom": "^6.22.2",
     "socket.io-client": "^4.7.4",
     "y-websocket": "^1.5.4",

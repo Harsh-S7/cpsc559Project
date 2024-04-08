@@ -3,6 +3,9 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Form from "./components/Form";
 import SharedDocumentComponent from "./components/SharedDocumentComponent";
+import Signin from "./routes/Signin/Signin";
+import Signup from "./routes/Signup/Signup";
+import Home from "./routes/Home/Home";
 
 const App = () => {
   return (
@@ -10,6 +13,9 @@ const App = () => {
       <BrowserRouter>
         <Routes>  
           <Route path="/" element={<Form />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/editor/:docId" element={<SharedDocumentComponent />} />
         </Routes>
       </BrowserRouter>
