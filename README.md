@@ -40,6 +40,86 @@ docker stack ls
 docker stack ps stackdemo
 ```
 
+### How to run app for EC2 instances
+
+- Before running docker, you must make sure all the .env and setup file is available for each layer
+
+#### Client (**1 instance required**)
+
+Frontend
+
+- Change to urls for this file to the according DNS
+- .env
+```
+VITE_WEBSOCKET_URL=ws://localhost:3000
+```
+- vite.config.js
+```
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+    plugins: [react()],
+    server: {
+        proxy: {
+            '/api': {
+                target: 'http://localhost:3000',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, '/api')
+            },
+        },
+    },
+});
+
+```
+
+- Compose up the frontend
+```sudo docker compose-up frontend```
+
+- To make sure only frontend is running, run this
+```sudo docker ps```
+
+#### Proxy ( **1 instance required**)
+
+- .env
+
+```
+PORT=3000
+WS_PRIMARY_URL=ws://backend-editor:3001
+WS_SECONDARY_URL=ws://backend-editor:3002
+HTTP_PRIMARY_URL=http://backend-user:3003
+```
+
+```sudo docker compose-up proxy```
+- To make sure only proxy is running, run this
+```sudo docker ps```
+
+#### Combined Server ( **3 instances required***)
+
+##### http-server
+
+- .env
+```
+PORT=3003
+MONGO_CONN="mongodb://root:example@database:27017"
+MONGO_DB="cpsc559"
+```
+##### server
+- .env
+```
+PORT=3001
+MONGO_URL="mongodb://root:example@database:27017/cpsc559"
+GC="true
+```
+
+- To compose up necessary containers
+```sudo docker compose-up backend-user backend-editor mongodb```
+
+- To make sure user server, editor server and mongo database running,
+
+```sudo docker ps```
+
+
 
 ## Workflow
 
