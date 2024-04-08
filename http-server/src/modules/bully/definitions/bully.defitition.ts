@@ -19,18 +19,20 @@ export class Bully {
     if (Math.max(...this.nodes) == this.node_id) {
       for (let node in this.nodes) {
         const res = await axios.post(
-          AddressBook[node] + `/bully/leader/{this.node_id}`,
+          AddressBook[node] + `/bully/leader/${this.node_id}`,
           {},
         );
-        if (res.data.bully) {
-          return;
-        }
+      }
+    } else {
+      for (let node in this.nodes) {
+        const res = await axios.post(
+          AddressBook[node] + `/bully/election/${this.node_id}`,
+          {},
+        );
       }
     }
   }
 }
 
-const node_id = process.env.NODE_ID
-  ? Number(process.env.NODE_ID)
-  : Number(process.env.PORT);
+const node_id = process.env.NODE_ID ? Number(process.env.NODE_ID) : 1;
 export const BullyObj = new Bully(node_id, [1, 2, 3]);
