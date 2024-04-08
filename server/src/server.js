@@ -20,9 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
 // const PORT = process.env.PORT || 3000;
-const PORT = 4001;
-
-// BELOW IS SET UP THE YJS WEBSOCKET FOR DOCUMENT EDITING
+const PORT = 4002;
 
 // Existing code for WebSocket server setup
 const wss = new WebSocketServer({ server });
@@ -57,135 +55,110 @@ setPersistence({
   },
 });
 
-
-// TESTTTT
-
 const nodes = [
   { id: 4000, address: 'http://localhost:4000' },
   { id: 4001, address: 'http://localhost:4001' },
   { id: 4002, address: 'http://localhost:4002' },
-  // Add other nodes with their IDs and addresses
 ];
 const myId = PORT; // Node ID is set in the environment variable
+
 let isPrimary = false;
+let primaryId = null
+let heartbeatTimeout = null;
+const heartbeatInterval = 15000; // 15 seconds
 
-async function sendHttpRequestWithRetry(url, data, retries = 3, delay = 1000) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      await axios.post(url, data);
-      return; // Success, exit the function
-    } catch (error) {
-      console.error(`Attempt ${i + 1}: Error sending request to ${url}, retrying in ${delay}ms...`, error.message);
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  console.error(`Failed to send request to ${url} after ${retries} attempts.`);
-}
-
-async function startElection() {
-  console.log('Starting election');
-  const electionTimeout = 5000; // Timeout in milliseconds
-  const electionPromises = [];
-
-  // Send election messages to nodes with higher IDs
-  for (const node of nodes) {
-    if (node.id > myId) {
-      electionPromises.push(
-        new Promise(async (resolve, reject) => {
-          try {
-            await sendHttpRequestWithRetry(`${node.address}/election`, { senderId: myId });
-            console.log(`Election message sent to ${node.address}`);
-            resolve(); // Resolve promise if message sent successfully
-          } catch (error) {
-            reject(error); // Reject promise if error occurs
-          }
-        })
-      );
-    }
-  }
-
-  // Wait for responses within the election timeout period
-  try {
-    await Promise.race([Promise.all(electionPromises), new Promise(resolve => setTimeout(resolve, electionTimeout))]);
-  } catch (error) {
-    console.error('Error occurred during election process:', error.message);
-  }
-
-  // If no responses received, declare itself as the primary node
-  if (!isPrimary) {
-    console.log('No response received within election timeout, declaring victory');
-    declareVictory();
-  }
-}
-
-
-function declareVictory() {
-  isPrimary = true;
-  console.log('I am the primary now');
-  nodes.filter(node => node.id < myId).forEach(node => {
-    sendHttpRequestWithRetry(`${node.address}/victory`, { newPrimaryId: myId })
-      .then(() => console.log(`Victory message sent to ${node.address}`))
-      .catch(err => console.error(`Error sending victory message to ${node.address}: ${err}`));
-  });
-}
-
-let primaryId = null; // Track the current primary node's ID
-
-// Function to check the health of the primary node
-function checkPrimaryNodeHealth() {
-  console.log("CHECKING PRIMARY NODE HEALTH")
-
-  if (isPrimary) {
-    return
-  }
-
-  if (primaryId === null) {
-    startElection();
-    return; // If this node is primary or no primary is known, do nothing
-  }
-
-  const primaryNode = nodes.find(node => node.id === primaryId);
-  if (!primaryNode) {
-    console.error('Primary node info not found');
-    return;
-  }
-
-  axios.get(`${primaryNode.address}/health`)
-    .then(response => {
-      if (response.status !== 200 || response.data.status !== 'ok') {
-        throw new Error('Primary node is not healthy');
-      }
-    })
-    .catch(() => {
-      console.log('Primary node is down, starting election');
-      startElection();
+function startElection() {
+  isPrimary = false;
+  primaryId = null;
+  const higherNodes = nodes.filter(n => n.id > myId);
+  if (higherNodes.length === 0) {
+    becomeLeader();
+  } else {
+    higherNodes.forEach(node => {
+      axios.post(`${node.address}/election`, { from: myId }).catch(e => console.log(`Node ${node.id} is down`));
     });
+    // Set a timeout to become the leader if no one responds
+    electionTimeout = setTimeout(becomeLeader, 5000); // 5 seconds timeout for simplicity
+  }
 }
 
-app.get('/health', (req, res) => {
-  console.log("IS PRIMARY: ", isPrimary)
-  res.json({ status: 'ok' });
+function becomeLeader() {
+  if (!isPrimary) {
+    isPrimary = true;
+    primaryId = myId;
+    console.log(`Node ${myId} is now the leader`);
+    clearTimeout(heartbeatTimeout);
+    // Announce leadership to all nodes
+    nodes.forEach(node => {
+      if (node.id !== myId) {
+        axios.post(`${node.address}/new-leader`, { leaderId: myId }).catch(e => console.log(`Node ${node.id} is down`));
+      }
+    });
+  }
+}
+
+// Reset leader if a new leader is announced
+app.post('/new-leader', (req, res) => {
+  const { leaderId } = req.body;
+  clearTimeout(electionTimeout);
+  isPrimary = false;
+  primaryId = leaderId;
+  console.log(`New leader is ${leaderId}`);
+  res.send('Leader acknowledged');
+});
+
+app.post('/election', (req, res) => {
+  const { from } = req.body;
+  console.log(`Election message received from ${from}`);
+  // Respond to signal active status and start own election
+  res.send('OK');
+  startElection();
+});
+
+setInterval(() => {
+  if (isPrimary) {
+    // Leader sends heartbeat to all
+    nodes.forEach(node => {
+      if (node.id !== myId) {
+        axios.post(`${node.address}/heartbeat`, { leaderId: myId })
+          .catch(e => console.log(`Node ${node.id} is down`));
+      }
+    });
+  }
+}, 5000); // 10 seconds for simplicity
+ 
+app.post('/heartbeat', (req, res) => {
+  const { leaderId } = req.body;
+  // Reset any election timeout upon receiving a heartbeat
+  clearTimeout(electionTimeout);
+  clearTimeout(heartbeatTimeout); // Reset the heartbeat timeout
+  
+  primaryId = leaderId;
+  console.log(`Received heartbeat from leader ${leaderId}`);
+  
+  // Restart the heartbeat timeout
+  heartbeatTimeout = setTimeout(() => {
+    console.log('Heartbeat missed. Starting election.');
+    startElection();
+  }, heartbeatInterval);
+  
+  res.send('Heartbeat acknowledged');
 });
 
 app.get('/isPrimary', (req, res) => {
-  // console.log("IS PRIMARY: ", isPrimary)
+  console.log("IS PRIMARY: ", isPrimary)
   res.json({ isPrimary: isPrimary });
-});
+ });
+ 
 
-// Start the health check interval
-setInterval(checkPrimaryNodeHealth, 5000); // Check every 5 seconds
-
-app.post('/victory', (req, res) => {
-  const { newPrimaryId } = req.body;
-  console.log(`Received victory message from ${newPrimaryId}`);
-  primaryId = newPrimaryId; // Update the primary ID
-  if (newPrimaryId !== myId) {
-    isPrimary = false;
-  }
-  res.json({ message: 'Victory message acknowledged' });
-});
-
-// Server listening setup, now including Express routes and WebSocket server
-server.listen(PORT, () => {
+ server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
+  startElection(); // Start an election when the server starts
+  // Initialize heartbeat timeout for replicas
+  if (!isPrimary) {
+    heartbeatTimeout = setTimeout(() => {
+      console.log('Heartbeat missed at startup. Starting election.');
+      startElection();
+    }, heartbeatInterval);
+  }
 });
