@@ -6,36 +6,38 @@ import MDEditor from '@uiw/react-md-editor';
 
 
 const SharedDocumentComponent = () => {
-  const { docId } = useParams();
-  const docName = docId || 'defaultDoc';
-  const [doc, setDoc] = useState(null);
-  const [content, setContent] = useState('');
+    const { docId } = useParams();
+    const docName = docId || 'defaultDoc';
+    const [doc, setDoc] = useState(null);
+    const [content, setContent] = useState('');
 
-  useEffect(() => {
-    const ydoc = new Y.Doc();
-    const wsProvider = new WebsocketProvider(`ws://backend:3001`, docName, ydoc);
-    const ytext = ydoc.getText('sharedText');
-    setDoc(ydoc);
+    useEffect(() => {
+        const ydoc = new Y.Doc();
+        console.log('Connecting to document:', docName);
+        const wsProvider = new WebsocketProvider(`ws://localhost:3000`, docName, ydoc);
+        const ytext = ydoc.getText('sharedText');
+        setDoc(ydoc);
 
-    ytext.observe(event => {
-      setContent(ytext.toString());
-    });
+        ytext.observe(event => {
+            setContent(ytext.toString());
+        });
 
-    setContent(ytext.toString());
+        setContent(ytext.toString());
 
-    return () => {
-      wsProvider.destroy();
-      ydoc.destroy();
+        return () => {
+            wsProvider.destroy();
+            ydoc.destroy();
+        };
+    }, [docName]);
+
+    const updateDocument = (newContent) => {
+        if (doc) {
+            const ytext = doc.getText('sharedText');
+            ytext.delete(0, ytext.length);
+            ytext.insert(0, newContent);
+            console.log('Document updated:', newContent)
+        }
     };
-  }, [docName]);
-
-  const updateDocument = (newContent) => {
-    if (doc) {
-      const ytext = doc.getText('sharedText');
-      ytext.delete(0, ytext.length);
-      ytext.insert(0, newContent);
-    }
-  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
