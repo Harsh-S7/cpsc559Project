@@ -1,7 +1,7 @@
 const BASE_URL = '/api';
 
 export const getString = async () => {
-    const response = await fetch(`${BASE_URL}/mstring`, {
+    const response = await fetch(`${BASE_URL}/user`, {
         method: 'GET',
     });
     console.log(response);
