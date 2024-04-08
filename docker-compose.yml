@@ -83,8 +83,6 @@ services:
       ports:
         - "5173:5173"
       command: "pnpm dev"
-      depends_on:
-        - proxy
 
 volumes:
   mongodb_data:

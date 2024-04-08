@@ -4,13 +4,14 @@ import { UserService } from "./user.service";
 export const UserController = Router();
 
 UserController.get("/", (_: Request, res: Response) => {
-  res.send("This is User API"); 
+  res.json({ m: "This is User API" });
+  // res.send("This is User API");
 });
 
 
 UserController.get("/:username", async (req: Request, res: Response) => {
   const user = await UserService.getUser(req.params.username);
-  res.send(user); 
+  res.send(user);
 });
 
 UserController.post("/", async( req: Request, res: Response) => {
