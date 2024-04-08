@@ -12,11 +12,14 @@ BullyController.post("/leader/:id", (req: Request, res: Response) => {
   res.status(200).send();
 });
 
-BullyController.post("/election/:id", (req: Request, res: Response) => {
+BullyController.post("/election/:id", async (req: Request, res: Response) => {
   const bullyObj = BullyObj;
   const id = Number(req.params.id);
   if (bullyObj.node_id > id) {
     res.send({ bully: bullyObj.node_id });
+    if (!bullyObj.node_id) {
+      await bullyObj.initiateElection();
+    }
   }
 });
 

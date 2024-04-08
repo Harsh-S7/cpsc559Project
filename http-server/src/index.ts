@@ -5,6 +5,7 @@ import { UserController } from "./modules/user/user.controller";
 import { mongdoDbSetup } from "./utils/mongodb.utils";
 import { DocumentController } from "./modules/document/document.controller";
 import { BullyController } from "./modules/bully/bully.controller";
+import { BullyObj } from "./modules/bully/definitions/bully.defitition";
 
 const BASE_URL = "/api";
 
@@ -20,6 +21,8 @@ app.use(`${BASE_URL}/document`, DocumentController);
 app.use(`${BASE_URL}/bully`, BullyController);
 
 mongdoDbSetup().then(() => {
+  const bo = BullyObj;
+  if (bo.node_id == 3) bo.initiateElection();
   app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
   });
