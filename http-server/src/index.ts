@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { UserController } from "./modules/user/user.controller";
 import { mongdoDbSetup } from "./utils/mongodb.utils";
 import { DocumentController } from "./modules/document/document.controller";
+import { BullyController } from "./modules/bully/bully.controller";
 
 const BASE_URL = "/api";
 
@@ -16,6 +17,7 @@ app.use(express.json());
 //load modules
 app.use(`${BASE_URL}/user`, UserController);
 app.use(`${BASE_URL}/document`, DocumentController);
+app.use(`${BASE_URL}/bully`, BullyController);
 
 mongdoDbSetup().then(() => {
   app.listen(port, () => {

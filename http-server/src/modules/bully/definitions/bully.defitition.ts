@@ -1,3 +1,6 @@
+import axios from "axios";
+import { AddressBook } from "./address.definition";
+
 export class Bully {
   node_id: number;
   nodes: number[];
@@ -11,17 +14,22 @@ export class Bully {
     this.leader = null;
   }
 
-  initiateElection() {
+  async initiateElection() {
     this.running = true;
     if (Math.max(...this.nodes) == this.node_id) {
-      // send leader (i)
-    } else {
-      // send election(i) to all Pj , i>i
-      // if all down, send leader(i) to all
-      // else bullied:
+      for (let node in this.nodes) {
+        const res = await axios.post(
+          AddressBook[node] + `/bully/leader/{this.node_id}`,
+          {},
+        );
+        if (res.data.bully) {
+          return;
+        }
+      }
     }
   }
 }
+
 const node_id = process.env.NODE_ID
   ? Number(process.env.NODE_ID)
   : Number(process.env.PORT);
