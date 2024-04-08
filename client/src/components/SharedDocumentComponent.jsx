@@ -14,7 +14,7 @@ const SharedDocumentComponent = () => {
     useEffect(() => {
         const ydoc = new Y.Doc();
         console.log('Connecting to document:', docName);
-        const wsProvider = new WebsocketProvider(`ws://localhost:3050`, docName, ydoc);
+        const wsProvider = new WebsocketProvider(import.meta.env.VITE_WEBSOCKET_URL, docName, ydoc);
         const ytext = ydoc.getText('sharedText');
         setDoc(ydoc);
 

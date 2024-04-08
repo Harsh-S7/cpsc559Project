@@ -16,12 +16,11 @@ let webSocket: WebSocket | null = null;
 let reconnectTimeout: NodeJS.Timeout | null = null;
 
 // Primary server URL
-const primaryServerUrl = 'ws://backend-editor:3001';
+const primaryServerUrl = process.env.WS_PRIMARY_URL || 'ws://backend-editor:3001';
 // Secondary server URL
-const secondaryServerUrl = 'ws://backend-editor:3002';
-
+const secondaryServerUrl = process.env.WS_SECONDARY_URL || 'ws://backend-editor:3002';
 // Primary server user URL
-const primaryServerUserUrl = 'http://backend-user:3003';
+const primaryServerUserUrl = process.env.HTTP_PRIMARY_URL || 'http://backend-user:3003';
 
 // Function to create a WebSocket connection to the primary or secondary server
 const connectToWebSocketServer = (url: string, documentNumber: string, ws: WebSocket) => {
