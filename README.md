@@ -85,8 +85,10 @@ export default defineConfig({
 
 ```
 PORT=3000
+WS_PRIMARY_URL=ws://backend-editor:3001
+WS_SECONDARY_URL=ws://backend-editor:3002
+HTTP_PRIMARY_URL=http://backend-user:3003
 ```
-
 
 ```sudo docker compose-up proxy```
 - To make sure only proxy is running, run this
