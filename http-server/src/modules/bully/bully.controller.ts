@@ -32,3 +32,8 @@ BullyController.get("/nodeDetails", (_: Request, res: Response) => {
     isLeader: bully.leader == bully.node_id,
   });
 });
+
+BullyController.get("/runElection", async (_: Request, res: Response) => {
+  await BullyObj.initiateElection();
+  res.status(200).send();
+});
