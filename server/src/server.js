@@ -7,6 +7,12 @@ const { MongodbPersistence } = require('y-mongodb-provider');
 const { setPersistence, setupWSConnection } = require('../websocket/utils.js');
 const WebSocket = require('ws');
 const axios = require('axios');
+const myId = PORT; // Node ID is set in the environment variable
+const heartbeatInterval = 15000; // 15 seconds
+
+let isPrimary = false;
+let primaryId = null
+let heartbeatTimeout = null;
 
 // Create an instance of Express
 const app = express();
@@ -46,6 +52,10 @@ setPersistence({
     Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc)); // applies the db to the doc on the server
     ydoc.on('update', async (update) => {
       mdb.storeUpdate(docName, update);
+      if (isPrimary) {
+        // Broadcast the update to other nodes
+        broadcastUpdate({ docName: docName, update: Array.from(update) });
+      }
     }); // Listens for updates and stores them in the db
   },
   writeState: () => {
@@ -60,12 +70,6 @@ const nodes = [
   { id: 4001, address: 'http://localhost:4001' },
   { id: 4002, address: 'http://localhost:4002' },
 ];
-const myId = PORT; // Node ID is set in the environment variable
-
-let isPrimary = false;
-let primaryId = null
-let heartbeatTimeout = null;
-const heartbeatInterval = 15000; // 15 seconds
 
 function startElection() {
   isPrimary = false;
@@ -150,6 +154,32 @@ app.get('/isPrimary', (req, res) => {
   res.json({ isPrimary: isPrimary });
  });
  
+
+
+function broadcastUpdate(update) {
+  nodes.forEach(node => {
+    if (node.id !== myId) { // Check to not send to itself
+      axios.post(`${node.address}/receive-update`, update)
+        .then(() => console.log(`Update sent to Node ${node.id}`))
+        .catch(e => console.log(`Failed to send update to Node ${node.id}`));
+    }
+  });
+}
+
+app.post('/receive-update', (req, res) => {
+  const { docName, updateArray } = req.body;
+  const update = new Uint8Array(updateArray);
+
+  // Assuming a function similar to bindState is available to find or create the YDoc
+  findOrCreateYDoc(docName).then((ydoc) => {
+    Y.applyUpdate(ydoc, update);
+    console.log(`Update applied to document ${docName}`);
+    res.send('Update received and applied');
+  }).catch(error => {
+    console.error(`Failed to apply update to document ${docName}: ${error}`);
+    res.status(500).send('Failed to apply update');
+  });
+});
 
  server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
