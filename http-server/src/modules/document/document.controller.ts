@@ -22,7 +22,9 @@ DocumentController.get(
 DocumentController.get(
   "/sharedWithUser/:userId",
   async (req: Request, res: Response) => {
-    res.send(await DocumentService.getDocumentSharedWithUser(req.params.userId));
+    res.send(
+      await DocumentService.getDocumentSharedWithUser(req.params.userId),
+    );
   },
 );
 
@@ -31,7 +33,8 @@ DocumentController.get(
   async (req: Request, res: Response) => {
     const userId = req.params.userId;
     const documentsByUser = await DocumentService.getDocumentByUser(userId);
-    const documentsSharedWithUser = await DocumentService.getDocumentSharedWithUser(userId);
+    const documentsSharedWithUser =
+      await DocumentService.getDocumentSharedWithUser(userId);
     res.send([...documentsByUser, ...documentsSharedWithUser]);
   },
 );
@@ -55,10 +58,7 @@ DocumentController.delete("/:id", async (req: Request, res: Response) => {
   res.sendStatus(200);
 });
 
-DocumentController.post(
-  "/share/:id",
-  async (req: Request, res: Response) => {
-    await DocumentService.shareDocument(req.params.id, req.body.shared);
-    res.sendStatus(200);
-  },
-);
+DocumentController.post("/share/:id", async (req: Request, res: Response) => {
+  await DocumentService.shareDocument(req.params.id, req.body.shared);
+  res.sendStatus(200);
+});

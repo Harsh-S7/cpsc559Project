@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { UserController } from "./modules/user/user.controller";
 import { mongdoDbSetup } from "./utils/mongodb.utils";
 import { DocumentController } from "./modules/document/document.controller";
+import { basicLogger } from "./utils/logger.utils";
 
 const BASE_URL = "/api";
 
@@ -13,6 +14,8 @@ const app: Express = express();
 const port = process.env.PORT || 3003;
 app.use(express.json());
 
+app.use(basicLogger);
+//app.use(errorHandler);
 //load modules
 app.use(`${BASE_URL}/user`, UserController);
 app.use(`${BASE_URL}/document`, DocumentController);
