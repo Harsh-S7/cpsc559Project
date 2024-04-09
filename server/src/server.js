@@ -112,7 +112,7 @@ function becomeLeader() {
     clearTimeout(heartbeatTimeout);
     // Announce leadership to all nodes
     nodes.forEach(node => {
-      if (node.id !== myId) {
+      if (node.id != myId) {
         axios.post(`${node.address}/new-leader`, { leaderId: myId }).catch(e => console.log(`Node ${node.id} is down`));
       }
     });
@@ -141,7 +141,7 @@ setInterval(() => {
   if (isPrimary) {
     // Leader sends heartbeat to all
     nodes.forEach(node => {
-      if (node.id !== myId) {
+      if (node.id != myId) {
         axios.post(`${node.address}/heartbeat`, { leaderId: myId })
           .catch(e => console.log(`Node ${node.id} is down`));
       }
@@ -173,7 +173,7 @@ app.get('/isPrimary', (req, res) => {
  });
 
  setInterval(async () => {
-  if (isPrimary) {
+  if (!isPrimary) {
     // Fetch and forward documents only if this node is the primary
     try {
       await client.connect();
@@ -181,7 +181,7 @@ app.get('/isPrimary', (req, res) => {
       const documents = await collection.find({}).toArray();
       // Forward documents to all replica nodes
       nodes.forEach(node => {
-        if (node.id !== myId) {
+        if (node.id != myId) {
           axios.post(`${node.address}/document-sync`, { documents })
             .catch(e => console.log(`Failed to forward documents to Node ${node.id}: ${e.message}`));
         }
@@ -223,10 +223,10 @@ app.post('/document-sync', async (req, res) => {
 });
 
 setInterval(async () => {
-  if (!isPrimary) {
+  if (isPrimary) {
     let PrimaryAddress = "";
-    proxy.forEach(node => {
-      if (node.id === primaryId) {
+    nodes.forEach(node => {
+      if (node.id == primaryId) {
         PrimaryAddress = node.address;
         axios.post(process.env.PROXY_ADDRESS + '/primary-update', { id: PrimaryAddress })
       }
