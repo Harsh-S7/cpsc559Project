@@ -5,7 +5,6 @@ import { UserController } from "./modules/user/user.controller";
 import { mongdoDbSetup } from "./utils/mongodb.utils";
 import { DocumentController } from "./modules/document/document.controller";
 import { basicLogger } from "./utils/logger.utils";
-import { errorHandler } from "./utils/error.utils";
 
 const BASE_URL = "/api";
 
