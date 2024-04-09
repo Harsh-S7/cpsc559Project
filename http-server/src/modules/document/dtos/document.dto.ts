@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { DocumentSchema } from "../../../schema/document/document.schema";
 
 export class DocumentRecord {
-  id: ObjectId;
+  id: string;
   name: string;
   owner: string;
   shared: string[];
