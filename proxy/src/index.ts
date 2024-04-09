@@ -16,8 +16,14 @@ let webSocket: WebSocket | null = null;
 let reconnectTimeout: NodeJS.Timeout | null = null;
 let primaryServerUrl: string = '';
 // Primary server user URL
-const primaryServerUserUrl = process.env.PRIMARY_SERVER_USER_URL || 'http://localhost:3003';
+let primaryServerUserUrl: string = 'https://shaggy-symbols-laugh.loca.lt/';
 let actualWebSocket: WebSocket;
+
+let serverUrlMap: Record<string, string> = {
+  'https://wild-banks-rush.loca.lt/': 'https://shaggy-symbols-laugh.loca.lt/',
+  'https://deep-tigers-push.loca.lt/': 'https://smooth-taxes-fold.loca.lt/',
+  'https://good-moons-sniff.loca.lt/': 'https://huge-ads-act.loca.lt/',
+};
 
 // Function to create a WebSocket connection to the primary or secondary server
 const connectToWebSocketServer = (documentNumber: string, ws: WebSocket) => {
@@ -107,6 +113,7 @@ function createProxy(target: string): RequestHandler {
     },
     proxyErrorHandler: function(err, res, next) {
       console.error('Primary server error:', err);
+      console.error('Server is:', primaryServerUserUrl)
       // If already switched to secondary and still error, proceed with error handling
       return next(err);
     }
@@ -130,6 +137,7 @@ app.post("/primary-update", (req: Request, res: Response) => {
 
   if (primary != primaryServerUrl) {
     primaryServerUrl = primary;
+    primaryServerUserUrl = serverUrlMap[primaryServerUrl];
     console.log("PRIMARY SERVER UPDATED", primary);
     res.status(200).send('Primary server updated');
   }
