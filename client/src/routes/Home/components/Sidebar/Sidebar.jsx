@@ -133,8 +133,7 @@ const Sidebar = (props) => {
                   />
                   <Stack className='account-info' spacing='1px'>
                         <div className='account-name'>
-                            {localStorage.getItem('name') ? localStorage.getItem('name') : 'User Name'}
-                            <span className='account-coin-count'>&nbsp;&nbsp;	&#40;{localStorage.coin} coins&#41;</span>
+                            {localStorage.getItem('username') ? localStorage.getItem('username') : 'User Name'}
                         </div>
                         <div className='account-username'>
                             {`@${localStorage.getItem('username') ? localStorage.getItem('username') : 'username'}`}
