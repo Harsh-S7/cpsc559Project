@@ -8,6 +8,7 @@ export const createNewUser = async (user) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
         body: JSON.stringify({
             username: user.username,
@@ -25,6 +26,7 @@ export const loginUser = async (user) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
     });
     console.log(response);
@@ -44,6 +46,7 @@ export const createNewDocument = async (documentName, username) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
         body: JSON.stringify({ 
             name: documentName, 
@@ -65,6 +68,7 @@ export const getDocumentsByUser = async (username) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
     });
     if (response.status === 200) {
@@ -83,6 +87,7 @@ export const getDocumentSharedWithUser = async (username) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
     });
     if (response.status === 200) {
@@ -101,6 +106,7 @@ export const getAllDocumentsByUser = async (username) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
     });
     if (response.status === 200) {
@@ -119,6 +125,7 @@ export const getDocumentById = async (docId) => {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
     });
     if (response.status === 200) {
@@ -137,6 +144,7 @@ export const deleteDocument = async (docId) => {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
     });
     if (response.status === 200) {
@@ -154,6 +162,7 @@ export const shareDocument = async (docId, usernames) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Bypass-Tunnel-Reminder': true,
         },
         body: JSON.stringify({ shared: usernames }),
     });
