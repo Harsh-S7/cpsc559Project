@@ -1,0 +1,24 @@
+.contents-list-container {
+    margin: 4rem 2rem 2rem;
+    height: fit-content;
+    width: 90%;
+
+    .stack-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .title-divider {
+        margin: 1rem 0;
+    }
+
+    .document-item {
+        cursor: pointer;
+
+        .document-item-name {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+    }
+}

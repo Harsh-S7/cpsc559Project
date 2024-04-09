@@ -1,0 +1,57 @@
+.registration-hero-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+    align-content: center;
+    margin-top: 30px;
+
+    .registration-logo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .registration-logo-name {
+        margin-left: 50px;
+        font-size: 30px;
+        font-weight: 700;
+        padding-bottom: 10px;
+    }
+}
+
+.registration-content-section {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 60%;
+    padding: 0 20px;
+}
+
+.registration-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.registration-inputs {
+    margin: 20px 0;
+}
+
+.registraion-action-btns {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 50px;
+    justify-content: center;
+}
+
+.registration-btn {
+    width: 185px;
+}
+
+.registration-forgot-link {
+    color: grey;
+    font-size: 14px;
+}

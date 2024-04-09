@@ -7,7 +7,32 @@ const { MongodbPersistence } = require('y-mongodb-provider');
 const { setPersistence, setupWSConnection } = require('../websocket/utils.js');
 const WebSocket = require('ws');
 const axios = require('axios');
+const { MongoClient, ObjectId, Binary } = require('mongodb');
 const heartbeatInterval = 15000; // 15 seconds
+let electionTimeout = null;
+const nodes = [];
+
+
+function parseNodesFromEnv() {
+  let i = 1;
+  while (true) {
+      const idKey = `NODE_${i}_ID`;
+      const addressKey = `NODE_${i}_ADDRESS`;
+
+      if (!process.env[idKey] || !process.env[addressKey]) {
+          break;
+      }
+
+      nodes.push({
+          id: parseInt(process.env[idKey]),
+          address: process.env[addressKey]
+      });
+
+      i++;
+  }
+}
+
+parseNodesFromEnv();
 
 let isPrimary = false;
 let primaryId = null
@@ -24,8 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
-const PORT = 4000;
-// const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 console.log("PORT: ", PORT)
 const myId = PORT; // Node ID is set in the environment variable
 
@@ -39,7 +63,8 @@ if (!process.env.MONGO_URL) {
   throw new Error('Please define the MONGO_URL environment variable');
 }
 
-const mdb = new MongodbPersistence(process.env.MONGO_URL, {
+const client = new MongoClient(process.env.MONGO_URL);
+const mdb = new MongodbPersistence(process.env.MONGO_URL+"/"+process.env.DATABASE, {
 collectionName: 'documents',
   flushSize: 100,
   multipleCollections: false,
@@ -47,18 +72,13 @@ collectionName: 'documents',
 
 setPersistence({
   bindState: async (docName, ydoc) => {
-    console.log("Start")
     const persistedYdoc = await mdb.getYDoc(docName);
     const newUpdates = Y.encodeStateAsUpdate(ydoc); // Insert or Delete
     mdb.storeUpdate(docName, newUpdates); // Stores it in the datbase
     Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc)); // applies the db to the doc on the server
     ydoc.on('update', async (update) => {
+      console.log(update)
       mdb.storeUpdate(docName, update);
-      console.log("Getting a request")
-      if (isPrimary) {
-        // Broadcast the update to other nodes
-        broadcastUpdate({ docName: docName, update: Array.from(update) });
-      }
     }); // Listens for updates and stores them in the db
   },
   writeState: () => {
@@ -67,12 +87,6 @@ setPersistence({
     }); // This promise sends the state to all the clients
   },
 });
-
-const nodes = [
-  { id: 4000, address: 'http://localhost:4000' },
-  { id: 4001, address: 'http://localhost:4001' },
-  { id: 4002, address: 'http://localhost:4002' },
-];
 
 function startElection() {
   isPrimary = false;
@@ -154,37 +168,70 @@ app.post('/heartbeat', (req, res) => {
 
 app.get('/isPrimary', (req, res) => {
   console.log("IS PRIMARY: ", isPrimary)
-  if (isPrimary) {
   res.json({ isPrimary: isPrimary });
-  }
  });
- 
 
-
-async function broadcastUpdate(update) {
-  nodes.forEach(node => {
-    if (node.id !== myId) { // Check to not send to itself
-      axios.post(`${node.address}/receive-update`, update)
-        .then(() => console.log(`Update sent to Node ${node.id}`))
-        .catch(e => console.log(`Failed to send update to Node ${node.id}`));
+ setInterval(async () => {
+  if (isPrimary) {
+    // Fetch and forward documents only if this node is the primary
+    try {
+      await client.connect();
+      const collection = client.db(process.env.DATABASE).collection(process.env.COLLECTION_NAME);
+      const documents = await collection.find({}).toArray();
+      // Forward documents to all replica nodes
+      nodes.forEach(node => {
+        if (node.id !== myId) {
+          axios.post(`${node.address}/document-sync`, { documents })
+            .catch(e => console.log(`Failed to forward documents to Node ${node.id}: ${e.message}`));
+        }
+      });
+    } catch (e) {
+      console.error('Failed to fetch or forward documents:', e.message);
     }
-  });
-}
+  }
+}, 3000);
 
-app.post('/receive-update', (req, res) => {
-  const { docName, updateArray } = req.body;
-  const update = new Uint8Array(updateArray);
+app.post('/document-sync', async (req, res) => {
+  const { documents } = req.body;
 
-  // Assuming a function similar to bindState is available to find or create the YDoc
-  findOrCreateYDoc(docName).then((ydoc) => {
-    mdb.storeUpdate(docName, update);
-    console.log(`Update applied to document ${docName}`);
-    res.send('Update received and applied');
-  }).catch(error => {
-    console.error(`Failed to apply update to document ${docName}: ${error}`);
-    res.status(500).send('Failed to apply update');
-  });
+  try {
+    await client.connect();
+    const collection = client.db(process.env.DATABASE).collection(process.env.COLLECTION_NAME);
+
+    // Delete all documents. Consider implications of temporary data unavailability.
+    await collection.deleteMany({});
+
+    // Insert the new documents if any
+    if (documents.length > 0) {
+      // Map documents to retain original _id values
+      console.log(documents)
+      const modifiedDocuments = documents.map(doc => ({
+        ...doc,
+        value: doc.value ? Binary.createFromBase64(doc.value, 0) : null, // Convert value to Binary
+        _id: doc._id ? new ObjectId(doc._id) : new ObjectId() // Retain original _id or generate new ObjectId
+      }));
+      await collection.insertMany(modifiedDocuments);
+    }
+
+    console.log(`Synchronized ${documents.length} documents.`);
+    res.send('Documents synchronized');
+  } catch (e) {
+    console.error('Failed to synchronize documents:', e.message);
+    res.status(500).send('Failed to synchronize documents');
+  }
 });
+
+setInterval(async () => {
+  if (!isPrimary) {
+    let PrimaryAddress = "";
+    proxy.forEach(node => {
+      if (node.id === primaryId) {
+        PrimaryAddress = node.address;
+        axios.post(process.env.PROXY_ADDRESS + '/primary-update', { id: PrimaryAddress })
+      }
+    });
+  }
+}, 5000);
 
  server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

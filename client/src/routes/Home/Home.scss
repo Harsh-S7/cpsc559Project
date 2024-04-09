@@ -1,0 +1,25 @@
+.home-layout {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    align-items: flex-start;
+  }
+  
+  .sidebar-container {
+    width: 25%;
+    height: 100vh;
+    border-right: 1px solid #e0e0e0;
+    transition: width 0.1s ease-in-out;
+  }
+  
+  .sidebar-container.minimized {
+    width: 5rem;
+    transition: width 0.2s ease-in-out;
+  }
+  
+  .dashboard-container {
+    flex-grow: 1;
+    max-height: 100vh;
+    overflow-y: auto;
+    background-color: #fff;
+  }

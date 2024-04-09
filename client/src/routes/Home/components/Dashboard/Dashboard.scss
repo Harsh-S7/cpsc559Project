@@ -1,0 +1,10 @@
+.dashboard-container {
+    height: 100vh; // ensure the container takes up the full viewport height
+  
+    .link-container { // new
+      max-width: 100%;
+      text-align: right;
+      margin: 4rem 0;
+      margin-right: 1rem;
+    }
+  }
