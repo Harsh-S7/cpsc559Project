@@ -15,7 +15,7 @@ const app: Express = express();
 const port = process.env.PORT || 3003;
 app.use(express.json());
 
-app.use(propagate);
+//app.use(propagate);
 
 app.use(basicLogger);
 //app.use(errorHandler);

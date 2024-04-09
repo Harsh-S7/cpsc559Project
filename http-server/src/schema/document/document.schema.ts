@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 export interface DocumentSchema {
-  _id: ObjectId;
+  _id: string;
   name: string;
   owner: string;
   shared: string[];

@@ -34,7 +34,7 @@ export class DocumentService {
 
   static async modifyDocument(id: string, doc: PutDocumentReqDto) {
     const newDoc: DocumentRecord = {
-      id: new ObjectId(doc.id),
+      id: doc.id,
       name: doc.name,
       shared: doc.shared,
       owner: doc.owner,
@@ -46,8 +46,12 @@ export class DocumentService {
   }
 
   static async createDocument(newDoc: PostDocumentReqDto) {
+    const newId = newDoc.name + newDoc.owner;
+    //+ (await this.getDocumentByUser(newDoc.owner)).length;
+    console.log(`newid: ${newId}`);
+
     const doc: DocumentRecord = {
-      id: new ObjectId((newDoc.name + newDoc.owner).repeat(5)),
+      id: newId,
       name: newDoc.name,
       owner: newDoc.owner,
       shared: [],
