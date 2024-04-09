@@ -24,8 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
-// const PORT = 4002;
-const PORT = process.env.PORT || 3000;
+const PORT = 4000;
+// const PORT = process.env.PORT || 3000;
 console.log("PORT: ", PORT)
 const myId = PORT; // Node ID is set in the environment variable
 
@@ -47,12 +47,14 @@ collectionName: 'documents',
 
 setPersistence({
   bindState: async (docName, ydoc) => {
+    console.log("Start")
     const persistedYdoc = await mdb.getYDoc(docName);
     const newUpdates = Y.encodeStateAsUpdate(ydoc); // Insert or Delete
     mdb.storeUpdate(docName, newUpdates); // Stores it in the datbase
     Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc)); // applies the db to the doc on the server
     ydoc.on('update', async (update) => {
       mdb.storeUpdate(docName, update);
+      console.log("Getting a request")
       if (isPrimary) {
         // Broadcast the update to other nodes
         broadcastUpdate({ docName: docName, update: Array.from(update) });
