@@ -221,7 +221,17 @@ app.post('/document-sync', async (req, res) => {
   }
 });
 
-
+setInterval(async () => {
+  if (!isPrimary) {
+    let PrimaryAddress = "";
+    proxy.forEach(node => {
+      if (node.id === primaryId) {
+        PrimaryAddress = node.address;
+        axios.post(process.env.PROXY_ADDRESS + '/primary-update', { id: PrimaryAddress })
+      }
+    });
+  }
+}, 5000);
 
  server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
