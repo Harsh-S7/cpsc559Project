@@ -7,7 +7,6 @@ const { MongodbPersistence } = require('y-mongodb-provider');
 const { setPersistence, setupWSConnection } = require('../websocket/utils.js');
 const WebSocket = require('ws');
 const axios = require('axios');
-const myId = PORT; // Node ID is set in the environment variable
 const heartbeatInterval = 15000; // 15 seconds
 
 let isPrimary = false;
@@ -25,8 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
-// const PORT = process.env.PORT || 3000;
-const PORT = 4002;
+// const PORT = 4002;
+const PORT = process.env.PORT || 3000;
+console.log("PORT: ", PORT)
+const myId = PORT; // Node ID is set in the environment variable
 
 // Existing code for WebSocket server setup
 const wss = new WebSocketServer({ server });
@@ -151,12 +152,14 @@ app.post('/heartbeat', (req, res) => {
 
 app.get('/isPrimary', (req, res) => {
   console.log("IS PRIMARY: ", isPrimary)
+  if (isPrimary) {
   res.json({ isPrimary: isPrimary });
+  }
  });
  
 
 
-function broadcastUpdate(update) {
+async function broadcastUpdate(update) {
   nodes.forEach(node => {
     if (node.id !== myId) { // Check to not send to itself
       axios.post(`${node.address}/receive-update`, update)
@@ -172,7 +175,7 @@ app.post('/receive-update', (req, res) => {
 
   // Assuming a function similar to bindState is available to find or create the YDoc
   findOrCreateYDoc(docName).then((ydoc) => {
-    Y.applyUpdate(ydoc, update);
+    mdb.storeUpdate(docName, update);
     console.log(`Update applied to document ${docName}`);
     res.send('Update received and applied');
   }).catch(error => {
