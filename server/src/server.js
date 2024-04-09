@@ -10,6 +10,29 @@ const axios = require('axios');
 const { MongoClient, ObjectId, Binary } = require('mongodb');
 const heartbeatInterval = 15000; // 15 seconds
 let electionTimeout = null;
+const nodes = [];
+
+
+function parseNodesFromEnv() {
+  let i = 1;
+  while (true) {
+      const idKey = `NODE_${i}_ID`;
+      const addressKey = `NODE_${i}_ADDRESS`;
+
+      if (!process.env[idKey] || !process.env[addressKey]) {
+          break;
+      }
+
+      nodes.push({
+          id: parseInt(process.env[idKey]),
+          address: process.env[addressKey]
+      });
+
+      i++;
+  }
+}
+
+parseNodesFromEnv();
 
 let isPrimary = false;
 let primaryId = null
@@ -64,11 +87,6 @@ setPersistence({
     }); // This promise sends the state to all the clients
   },
 });
-
-const nodes = [
-  { id: 4000, address: 'http://localhost:4000' },
-  { id: 4001, address: 'https://tasty-worlds-lie.loca.lt' },
-];
 
 function startElection() {
   isPrimary = false;
