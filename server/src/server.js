@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
-const PORT = 4000;
+const PORT = 3001;
 // const PORT = process.env.PORT || 3000;
 console.log("PORT: ", PORT)
 const myId = PORT; // Node ID is set in the environment variable
@@ -133,22 +133,22 @@ setInterval(() => {
     });
   }
 }, 5000); // 10 seconds for simplicity
- 
+
 app.post('/heartbeat', (req, res) => {
   const { leaderId } = req.body;
   // Reset any election timeout upon receiving a heartbeat
   clearTimeout(electionTimeout);
   clearTimeout(heartbeatTimeout); // Reset the heartbeat timeout
-  
+
   primaryId = leaderId;
   console.log(`Received heartbeat from leader ${leaderId}`);
-  
+
   // Restart the heartbeat timeout
   heartbeatTimeout = setTimeout(() => {
     console.log('Heartbeat missed. Starting election.');
     startElection();
   }, heartbeatInterval);
-  
+
   res.send('Heartbeat acknowledged');
 });
 
@@ -158,7 +158,7 @@ app.get('/isPrimary', (req, res) => {
   res.json({ isPrimary: isPrimary });
   }
  });
- 
+
 
 
 async function broadcastUpdate(update) {

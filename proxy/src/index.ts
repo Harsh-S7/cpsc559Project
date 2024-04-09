@@ -14,17 +14,14 @@ const port = process.env.PORT || 3000;
 const { app: wsApp } = expressWs(app);
 let webSocket: WebSocket | null = null;
 let reconnectTimeout: NodeJS.Timeout | null = null;
-
-// Primary server URL
-const primaryServerUrl = process.env.WS_PRIMARY_URL || 'ws://backend-editor:3001';
-// Secondary server URL
-const secondaryServerUrl = process.env.WS_SECONDARY_URL || 'ws://backend-editor:3002';
+let  primaryServerUrl: string = '';
 // Primary server user URL
-const primaryServerUserUrl = process.env.HTTP_PRIMARY_URL || 'http://backend-user:3003';
+const primaryServerUserUrl = 'http://localhost:3003';
 
 // Function to create a WebSocket connection to the primary or secondary server
-const connectToWebSocketServer = (url: string, documentNumber: string, ws: WebSocket) => {
-  let actualWebSocket = new WebSocket(`${url}/${documentNumber}`);
+const connectToWebSocketServer = (documentNumber: string, ws: WebSocket) => {
+
+  let actualWebSocket = new WebSocket(`${primaryServerUrl}/${documentNumber}`);
 
   // Handle WebSocket client events
   actualWebSocket.on('open', () => {
@@ -42,10 +39,8 @@ const connectToWebSocketServer = (url: string, documentNumber: string, ws: WebSo
   actualWebSocket.on('error', (error) => {
     console.error('WebSocket error:', error);
     // If the primary server fails, try connecting to the secondary server
-    if (url === primaryServerUrl) {
-      console.log('Trying secondary server...');
-      connectToWebSocketServer(secondaryServerUrl, documentNumber, ws);
-    }
+    console.log('Trying again server...');
+    connectToWebSocketServer(documentNumber, ws);
   });
 
   actualWebSocket.on('close', () => {
@@ -59,10 +54,12 @@ wsApp.ws('/:documentNumber', (ws: WebSocket, req: Request) => {
   const documentNumber = req.params.documentNumber;
 
   // Create a WebSocket connection to the primary server
-  let actualWebSocket = connectToWebSocketServer(primaryServerUrl, documentNumber, ws);
+  let actualWebSocket = connectToWebSocketServer(documentNumber, ws);
+  console.log('actualWebSocket:', actualWebSocket);
 
   ws.on('open', () => {
     console.log(`[client] WebSocket connection opened for document number ${documentNumber}`);
+    ws.send('WebSocket connection opened to proxy server');
   });
 
   // Forward messages received from the client to the actual WebSocket server
@@ -72,6 +69,9 @@ wsApp.ws('/:documentNumber', (ws: WebSocket, req: Request) => {
     if (actualWebSocket.readyState === WebSocket.OPEN) {
       console.log('Forwarding message to actual WebSocket server:', message);
       actualWebSocket.send(message);
+    }
+    else {
+      ws.send('WebSocket server is not connected. Please try again');
     }
   });
 
@@ -92,16 +92,11 @@ app.use(express.json(), cors());
 function createProxy(target: string): RequestHandler {
   return proxy(target, {
     proxyReqPathResolver: async function(req: Request) {
-      const param = req.params.endpoint;
-      return `${target}/api/${param}`;
+      const param = req.originalUrl;;
+      return `${target}${param}`;
     },
     proxyErrorHandler: function(err, res, next) {
       console.error('Primary server error:', err);
-      // If there's an error with the primary server, switch to the secondary server
-      if (target === primaryServerUrl) {
-        console.log('Switching to secondary server...');
-        return createProxy(secondaryServerUrl)(res.req, res, next);
-      }
       // If already switched to secondary and still error, proceed with error handling
       return next(err);
     }
@@ -111,12 +106,26 @@ function createProxy(target: string): RequestHandler {
 const proxyMiddleware = createProxy(primaryServerUserUrl);
 
 app.use('/api/:endpoint', (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.originalUrl)
   console.log('Proxying request to primary server...');
   proxyMiddleware(req, res, next);
 }, cors());
 
 app.get("/server-down", (req: Request, res: Response) => {
   res.status(500).send("Servers are down");
+});
+
+app.post("/primary-update", (req: Request, res: Response) => {
+  const primary = req.body.id;
+
+  if (primary) {
+    primaryServerUrl = primary;
+    res.status(200).send('Primary server updated');
+  }
+  else {
+    res.status(400).send('Primary server URL not provided');
+    throw new Error('Primary server URL not provided');
+  }
 });
 
 app.listen(port, () => {
