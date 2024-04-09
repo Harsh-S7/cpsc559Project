@@ -246,6 +246,8 @@ setInterval(async () => {
         PrimaryAddress = node.address;
         axios.post(process.env.PROXY_ADDRESS + "/primary-update", {
           id: PrimaryAddress,
+        }).catch((error) => {
+          console.log("Error updating primary address");
         });
       }
     });
