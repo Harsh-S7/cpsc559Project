@@ -26,8 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create an HTTP server and pass the Express app
 const server = http.createServer(app);
-const PORT = 4000;
-// const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 console.log("PORT: ", PORT)
 const myId = PORT; // Node ID is set in the environment variable
 
@@ -68,7 +67,7 @@ setPersistence({
 
 const nodes = [
   { id: 4000, address: 'http://localhost:4000' },
-  { id: 4001, address: 'http://localhost:4001' },
+  { id: 4001, address: 'https://tasty-worlds-lie.loca.lt' },
 ];
 
 function startElection() {
