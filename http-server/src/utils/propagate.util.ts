@@ -25,8 +25,8 @@ export const propagate = async function (
       data: req.body,
     };
     console.log(clone1_pack);
-    // await axios(clone1_pack);
-    // await axios(clone2_pack);
+    await axios(clone1_pack);
+    await axios(clone2_pack);
   }
   next();
 };

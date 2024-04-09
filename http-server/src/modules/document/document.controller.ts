@@ -9,22 +9,34 @@ DocumentController.get("/", (_: Request, res: Response) => {
 });
 
 DocumentController.get("/all", async (_: Request, res: Response) => {
-  res.send(await DocumentService.getAllDocument());
+  try {
+    res.send(await DocumentService.getAllDocument());
+  } catch (e) {
+    res.status(500).send("sth broke");
+  }
 });
 
 DocumentController.get(
   "/byUser/:userId",
   async (req: Request, res: Response) => {
-    res.send(await DocumentService.getDocumentByUser(req.params.userId));
+    try {
+      res.send(await DocumentService.getDocumentByUser(req.params.userId));
+    } catch (e) {
+      res.status(500).send("sth broke");
+    }
   },
 );
 
 DocumentController.get(
   "/sharedWithUser/:userId",
   async (req: Request, res: Response) => {
-    res.send(
-      await DocumentService.getDocumentSharedWithUser(req.params.userId),
-    );
+    try {
+      res.send(
+        await DocumentService.getDocumentSharedWithUser(req.params.userId),
+      );
+    } catch (e) {
+      res.status(500).send("sth broke");
+    }
   },
 );
 
