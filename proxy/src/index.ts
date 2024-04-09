@@ -14,14 +14,24 @@ const port = process.env.PORT || 3000;
 const { app: wsApp } = expressWs(app);
 let webSocket: WebSocket | null = null;
 let reconnectTimeout: NodeJS.Timeout | null = null;
-let  primaryServerUrl: string = '';
+let primaryServerUrl: string = '';
 // Primary server user URL
-const primaryServerUserUrl = 'http://localhost:3003';
+const primaryServerUserUrl = process.env.PRIMARY_SERVER_USER_URL || 'http://localhost:3003';
+let actualWebSocket: WebSocket;
 
 // Function to create a WebSocket connection to the primary or secondary server
 const connectToWebSocketServer = (documentNumber: string, ws: WebSocket) => {
 
-  let actualWebSocket = new WebSocket(`${primaryServerUrl}/${documentNumber}`);
+  if (primaryServerUrl == '') {
+    console.log('Primary server not set');
+  }
+  else {
+    console.log('Primary server set:', primaryServerUrl);
+  }
+  if (!actualWebSocket) {
+    console.log("NEW SERVER WEBSOCKET IS CREATED")
+    actualWebSocket = new WebSocket(`${primaryServerUrl}/${documentNumber}`);
+  }
 
   // Handle WebSocket client events
   actualWebSocket.on('open', () => {
@@ -38,6 +48,7 @@ const connectToWebSocketServer = (documentNumber: string, ws: WebSocket) => {
 
   actualWebSocket.on('error', (error) => {
     console.error('WebSocket error:', error);
+    actualWebSocket.close();
     // If the primary server fails, try connecting to the secondary server
     console.log('Trying again server...');
     connectToWebSocketServer(documentNumber, ws);
@@ -47,15 +58,13 @@ const connectToWebSocketServer = (documentNumber: string, ws: WebSocket) => {
     console.log(`[Server] Disconnected from actual WebSocket server for document number ${documentNumber}`);
   });
 
-  return actualWebSocket;
 };
 
 wsApp.ws('/:documentNumber', (ws: WebSocket, req: Request) => {
   const documentNumber = req.params.documentNumber;
 
   // Create a WebSocket connection to the primary server
-  let actualWebSocket = connectToWebSocketServer(documentNumber, ws);
-  console.log('actualWebSocket:', actualWebSocket);
+  connectToWebSocketServer(documentNumber, ws);
 
   ws.on('open', () => {
     console.log(`[client] WebSocket connection opened for document number ${documentNumber}`);
@@ -77,6 +86,7 @@ wsApp.ws('/:documentNumber', (ws: WebSocket, req: Request) => {
 
   // Handle WebSocket close event
   ws.on('close', () => {
+
     console.log(`[client] WebSocket connection closed for document number ${documentNumber}`);
   });
 
@@ -105,7 +115,7 @@ function createProxy(target: string): RequestHandler {
 
 const proxyMiddleware = createProxy(primaryServerUserUrl);
 
-app.use('/api/:endpoint', (req: Request, res: Response, next: NextFunction) => {
+app.use('/api', (req: Request, res: Response, next: NextFunction) => {
   console.log(req.originalUrl)
   console.log('Proxying request to primary server...');
   proxyMiddleware(req, res, next);
@@ -120,6 +130,7 @@ app.post("/primary-update", (req: Request, res: Response) => {
 
   if (primary != primaryServerUrl) {
     primaryServerUrl = primary;
+    console.log("PRIMARY SERVER UPDATED", primary);
     res.status(200).send('Primary server updated');
   }
   else {
