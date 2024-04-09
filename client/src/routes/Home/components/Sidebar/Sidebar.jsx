@@ -2,7 +2,7 @@ import React from 'react'
 import { Input, Avatar, IconButton, Stack, Button, Box, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react'
 import { ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons'
 import Icon from '@mdi/react'
-import { mdiHistory, mdiHelpBoxMultipleOutline, mdiCardsOutline, mdiStarOutline, mdiAccountGroupOutline, mdiCog } from '@mdi/js'
+import { mdiHistory, mdiCog, mdiFolderAccount, mdiFolder } from '@mdi/js'
 import { useNavigate } from 'react-router-dom'
 
 import './Sidebar.scss'
@@ -15,10 +15,8 @@ const buttonsText = [
 
 const buttonsIcons = [
     mdiHistory,
-    mdiHelpBoxMultipleOutline,
-    mdiCardsOutline,
-    mdiStarOutline,
-    mdiAccountGroupOutline
+    mdiFolder,
+    mdiFolderAccount, 
 ]
 
 const Sidebar = (props) => {

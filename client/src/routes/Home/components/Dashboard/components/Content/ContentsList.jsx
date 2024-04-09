@@ -1,5 +1,8 @@
 import React from 'react'
-import { Skeleton, Stack, StackDivider, VStack, Box, Grid, GridItem, Divider } from '@chakra-ui/react'
+import { Skeleton, Stack, StackDivider, VStack, Box, Grid, GridItem, Divider, Menu, MenuButton, MenuList, MenuItem, IconButton } from '@chakra-ui/react'
+import { HamburgerIcon, AddIcon, ExternalLinkIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons'
+import { mdiDotsVertical } from '@mdi/js';
+import Icon from '@mdi/react';
 import { useNavigate } from 'react-router-dom'
 
 import './ContentsList.scss'
@@ -22,25 +25,44 @@ const contents = [
   },
 ]
 
-const ContentsList = () => {
+const ContentsList = (props) => {
   const navigate = useNavigate()
-
   const documentItem = (document) => {
     return (
       <Box
         className='document-item'
-        key={document.contentId}
-        onClick={() => navigate(`/editor/${document.contentId}`)}
+        key={document.id}
+        
       >
         <Grid templateColumns='repeat(6, 1fr)' gap={6}>
-          <GridItem colSpan={5}>
+          <GridItem colSpan={5} onClick={() => navigate(`/editor/${document.id}`)}>
             <Stack spacing={0} className='document-item-content'>
               <Box className='document-item-name'>{document.name}</Box>
-              <Box className='document-item-last-opened'>Last opened: {document.lastOpened}</Box>
+              <Box className='document-item-last-opened'>Last opened: 1 day ago</Box>
             </Stack>
           </GridItem>
-          <GridItem colSpan={1}>
-            <Box className='document-item-actions'>Actions</Box>
+          <GridItem style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Box className='document-item-actions'>
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label='Options'
+                  icon={<Icon path={mdiDotsVertical} size={1} />}
+                  variant='ghost'
+                />
+                <MenuList>
+                  <MenuItem icon={<AddIcon />}>
+                    Share
+                  </MenuItem>
+                  <MenuItem icon={<EditIcon />} >
+                    Rename
+                  </MenuItem>
+                  <MenuItem icon={<DeleteIcon />} >
+                    Delete File
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
           </GridItem>
         </Grid>
       </Box>
@@ -56,15 +78,12 @@ const ContentsList = () => {
                 <Box className='document-item-name'>Document Name</Box>
               </Stack>
             </GridItem>
-            <GridItem colSpan={1}>
-              <Box className='document-item-actions'>Actions</Box>
-            </GridItem>
           </Grid>
         </Box>
       <Divider className='title-divider' borderWidth='2px' borderColor='black' />
       <VStack align='stretch' spacing={4} divider={<StackDivider border='gray.200' />}>
         
-        {contents.map((document) => documentItem(document))}
+        {props.documents.map((document) => documentItem(document))}
       </VStack>
     </div>
   )

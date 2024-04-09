@@ -4,18 +4,27 @@ import Dashboard from './components/Dashboard/Dashboard'
 import Sidebar from './components/Sidebar/Sidebar'
 // import Editor from './components/Editor/Editor'
 
+import { getDocumentsByUser } from '../../../lib/utils';
+
 import './Home.scss'
 
 const Home = () => {
-  const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = React.useState(!location.pathname.includes('/home/quiz/') && !location.pathname.includes('/home/flashcards/'));
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
   const [currentTab, setCurrentTab] = React.useState('Recents');
+  const [documents, setDocuments] = React.useState([]);
+
+  const fetchDocuments = async () => {
+    const response = await getDocumentsByUser(localStorage.getItem('username'));
+    if (response instanceof Error) {
+      console.error(response);
+    }
+    console.log(response);
+    setDocuments(response);
+  }
 
   useEffect(() => {
-    if (isSidebarOpen && (location.pathname.includes('/home/quiz/') || location.pathname.includes('/home/flashcards/') || location.pathname.includes('/home/summary/'))) {
-      setIsSidebarOpen(false);
-    }
-  }, [location, isSidebarOpen]);
+    fetchDocuments();
+  }, []);
 
   return (
     <div className='home-layout'>
@@ -34,8 +43,9 @@ const Home = () => {
               setCurrentTab={setCurrentTab}
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
+              documents={documents}
+              fetchDocuments={fetchDocuments}
             />} />
-          {/* <Route path="/editor/:documentId" element={<Editor />} /> */}
         </Routes>
       </div>    
     </div>

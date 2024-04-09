@@ -13,10 +13,7 @@ const Header = (props) => {
           <BreadcrumbLink className='breadcrumb-link' href='#'>{props.currentTab}</BreadcrumbLink>
         </BreadcrumbItem>
       </Breadcrumb>
-      <Button className='import-btn' colorScheme='brand' onClick={(e) => {
-        e.preventDefault();
-        props.setCurrentTab('Import');
-      }}>
+      <Button className='import-btn' colorScheme='brand' onClick={props.onOpen}>
           New Document
       </Button>
     </div>

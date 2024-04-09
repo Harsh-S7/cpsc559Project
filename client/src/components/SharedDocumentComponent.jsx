@@ -4,12 +4,28 @@ import { WebsocketProvider } from 'y-websocket';
 import { useParams } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
 
+import { getDocumentById } from '../../lib/utils';
+
+import './SharedDocumentComponent.scss';
 
 const SharedDocumentComponent = () => {
     const { docId } = useParams();
-    const docName = docId || 'defaultDoc';
+    const [docName, setDocName] = useState('');
     const [doc, setDoc] = useState(null);
     const [content, setContent] = useState('');
+
+    useEffect(() => {
+        const fetchDocument = async () => {
+            const response = await getDocumentById(docId);
+            if (response instanceof Error) {
+                console.error(response);
+            }
+            console.log (response);
+            setDocName(response.name);
+        };
+
+        fetchDocument();
+    },[]);
 
     useEffect(() => {
         const ydoc = new Y.Doc();
@@ -41,16 +57,12 @@ const SharedDocumentComponent = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>Document Name: {docName}</h2>
-      {/* <textarea
-        value={content}
-        onChange={(e) => updateDocument(e.target.value)}
-        style={{ width: '95%', height: '400px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-      /> */}
+      <h2 style={{ fontSize: '24px', fontWeight: 'bold', background: '#0D1117', width: "100%", height: "fit-content", color: "white", padding: "2rem" }}>Document: {docName}</h2>
       <MDEditor
+        className='markdown-editor'
         value={content}
         onChange={updateDocument}
-        style={{ width: '95%', height: '1000px', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+        style={{ width: '100%', minHeight: '100vh', padding: '10px' }}
       />
       <MDEditor.Markdown source={content} style={{ whiteSpace: 'pre-wrap', display: 'none' }} />
     </div>

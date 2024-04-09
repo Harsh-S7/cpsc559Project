@@ -2,6 +2,8 @@ import React from 'react'
 import { useNavigate } from "react-router";
 import { Input, Stack, Button, ButtonGroup, Link } from '@chakra-ui/react'
 
+import { loginUser } from '../../../lib/utils'
+
 import './Signin.scss'
 
 const Registration = () => {
@@ -18,22 +20,20 @@ const Registration = () => {
     const isLoginValid = username.length > 0 && password.length > 0;
 
     const handleLogin = async () => {
-        // if (!isLoginValid) {
-        //     return;
-        // }
-        // const data = await logInUser(username, password);
-        // if (data instanceof Error) {
-        //     console.error(data);
-        // }
+        if (!isLoginValid) {
+            return;
+        }
+        const response = await loginUser({ username, password });
+        if (response instanceof Error) {
+            console.error(response);
+        }
 
-        // console.log(data)
+        console.log(response);
 
-        // if (data._id) {
-        //     localStorage.setItem('username', data.UserName);
-        //     localStorage.setItem('name', data.FirstName + ' ' + data.LastName);
-        //     localStorage.setItem('coin', data.coinCount);
-        //     navigate('/home');
-        // }
+        if (response.username) {
+            localStorage.setItem('username', response.username);
+            navigate('/home');
+        }
     }
 
   return (
