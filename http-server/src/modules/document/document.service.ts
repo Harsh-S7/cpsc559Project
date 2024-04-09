@@ -18,7 +18,9 @@ export class DocumentService {
     return DocumentRepository.getDocumentsByUser(username);
   }
 
-  static async getDocumentSharedWithUser(username: string): Promise<DocumentRecord[]> {
+  static async getDocumentSharedWithUser(
+    username: string,
+  ): Promise<DocumentRecord[]> {
     const user = await UserRepository.getUser(username);
     if (!user) throw new Error("user not found");
     return DocumentRepository.getDocumentSharedWithUser(username);
@@ -45,14 +47,14 @@ export class DocumentService {
 
   static async createDocument(newDoc: PostDocumentReqDto) {
     const doc: DocumentRecord = {
-      id: new ObjectId(),
+      id: new ObjectId((newDoc.name + newDoc.owner).repeat(5)),
       name: newDoc.name,
       owner: newDoc.owner,
       shared: [],
     };
     await DocumentRepository.createDocument(doc);
   }
-  
+
   static async deleteDocument(id: string) {
     const doc = await DocumentRepository.getDocument(id);
     if (!doc) throw new Error("doc not found");
