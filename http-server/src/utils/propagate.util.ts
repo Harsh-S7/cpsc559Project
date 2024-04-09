@@ -10,7 +10,7 @@ export const propagate = async function (
   const websocketUrl = `http://localhost:${webSocketPort}`;
   const isPrimary = (await axios.get(websocketUrl + "/isPrimary")).data
     .isPrimary;
-  if (isPrimary) {
+  if (isPrimary && req.method != "GET") {
     // do propagation if is primary
     const clone1 = process.env.CLONE1;
     const clone2 = process.env.CLONE2;
@@ -24,8 +24,9 @@ export const propagate = async function (
       url: clone2 + req.originalUrl,
       data: req.body,
     };
+    console.log(clone1_pack);
     await axios(clone1_pack);
-    await axios(clone2_pack);
+    // await axios(clone2_pack);
   }
   next();
 };
