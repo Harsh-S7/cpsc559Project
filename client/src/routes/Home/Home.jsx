@@ -4,7 +4,7 @@ import Dashboard from './components/Dashboard/Dashboard'
 import Sidebar from './components/Sidebar/Sidebar'
 // import Editor from './components/Editor/Editor'
 
-import { getDocumentsByUser } from '../../../lib/utils';
+import { getDocumentsByUser, getDocumentSharedWithUser, getAllDocumentsByUser } from '../../../lib/utils';
 
 import './Home.scss'
 
@@ -13,7 +13,7 @@ const Home = () => {
   const [currentTab, setCurrentTab] = React.useState('Recents');
   const [documents, setDocuments] = React.useState([]);
 
-  const fetchDocuments = async () => {
+  const fetchDocumentsByUser = async () => {
     const response = await getDocumentsByUser(localStorage.getItem('username'));
     if (response instanceof Error) {
       console.error(response);
@@ -22,9 +22,34 @@ const Home = () => {
     setDocuments(response);
   }
 
+  const fetchDocumentsSharedWithUser = async () => {
+    const response = await getDocumentSharedWithUser(localStorage.getItem('username'));
+    if (response instanceof Error) {
+      console.error(response);
+    }
+    console.log(response);
+    setDocuments(response);
+  }
+
+  const fetchAllDocuments = async () => {
+    const response = await getAllDocumentsByUser(localStorage.getItem('username'));
+    if (response instanceof Error) {
+      console.error(response);
+    }
+    console.log(response);
+    setDocuments(response);
+  }
+
+  let fetchDocuments = fetchAllDocuments;
+  if (currentTab === 'Shared with me') {
+    fetchDocuments = fetchDocumentsSharedWithUser;
+  } else if (currentTab === 'My Documents') {
+    fetchDocuments = fetchDocumentsByUser;
+  }
+
   useEffect(() => {
     fetchDocuments();
-  }, []);
+  }, [currentTab]);
 
   return (
     <div className='home-layout'>

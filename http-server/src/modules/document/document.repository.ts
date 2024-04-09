@@ -17,6 +17,13 @@ export class DocumentRepository {
     return findResults.map((doc) => DocumentRecord.fromSchema(doc));
   }
 
+  static async getDocumentSharedWithUser(user: string): Promise<DocumentRecord[]> {
+    const docs = collections.docs!;
+    const query = { shared: { $in: [user] } };
+    const findResults = await docs.find<DocumentSchema>(query).toArray();
+    return findResults.map((doc) => DocumentRecord.fromSchema(doc));
+  }
+
   static async getDocument(id: string): Promise<DocumentRecord | null> {
     const docs = collections.docs!;
     const query = { _id: new ObjectId(id) };
@@ -39,5 +46,31 @@ export class DocumentRepository {
     const query = { _id: updatedDoc._id };
     const result = await docs.updateOne(query, { $set: updatedDoc });
     if (!result) throw new Error("Failed");
+  }
+
+  static async deleteDocument(id: string) {
+    const docs = collections.docs!;
+    const query = { _id: new ObjectId(id) };
+    const result = await docs.deleteOne(query);
+    if (!result) throw new Error("Failed");
+  }
+
+  static async shareDocument(id: string, sharedUsers: string[]) {
+    const docs = collections.docs!;
+    const query = { _id: new ObjectId(id) };
+    const result = await docs.updateOne(query, { $addToSet: { shared: { $each: sharedUsers } } });
+    if (!result) throw new Error("Failed");
+  }
+
+  static async verifyAccess(id: string, user: string) {
+    const docs = collections.docs!;
+    const query = { _id: new ObjectId(id) };
+    const result = await docs.findOne(query);
+    if (!result) throw new Error("doc not found");
+    if (result.owner !== user && !result.shared.includes(user)) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }

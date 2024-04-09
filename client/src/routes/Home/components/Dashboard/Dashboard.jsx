@@ -69,7 +69,7 @@ const Dashboard = (props) => {
         setIsSidebarOpen={props.setIsSidebarOpen}
         onOpen={onOpen}
       />
-      <ContentsList documents={props.documents}/>
+      <ContentsList documents={props.documents} fetchDocuments={props.fetchDocuments}/>
       {newDocumentModal}
     </div>
   )

@@ -4,7 +4,7 @@ import { Input, Stack, Button, ButtonGroup, useToast } from '@chakra-ui/react'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { Link as ChakraLink } from '@chakra-ui/react'
 
-// import { createNewUser } from '../../../../lib/utils'
+import { createNewUser } from '../../../lib/utils'
 
 import './Signup.scss'
 
@@ -16,8 +16,6 @@ const Signup = () => {
     const [password, setPassword] = React.useState('');
     const [passwordConfirm, setPasswordConfirm] = React.useState('');
     const [username, setUsername] = React.useState('');
-    const [firstname, setFirstname] = React.useState('');
-    const [lastname, setLastname] = React.useState('');
 
     const isPasswordConfInvalid = (password.length > 0 && passwordConfirm.length > 0) && (password !== passwordConfirm);
     const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
@@ -25,24 +23,27 @@ const Signup = () => {
     const isPasswordValid = password.length > 0 && passwordConfirm.length > 0 && password === passwordConfirm;
 
     const handleSignup = async () => {
-        // const response = await createNewUser(username, password, email, firstname, lastname);
-        // if (response.status !== 201) {
-        //     toast({
-        //         title: 'Account creation failed',
-        //         status: 'error',
-        //         duration: 3000,
-        //         isClosable: true,
-        //     });
-        //     console.error(response);
-        //     return;
-        // }
-        // toast({
-        //     title: 'Account created successfully',
-        //     status: 'success',
-        //     duration: 3000,
-        //     isClosable: true,
-        // });
-        // navigate('/signin');
+        if (!isPasswordValid || isEmailConfInvalid) {
+            return;
+        }
+
+        const response = await createNewUser({ username, password, email });
+        if (response instanceof Error) {
+            console.error(response);
+            toast({
+                title: 'Error',
+                description: 'An error occurred while creating the user',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+            });
+        }
+
+        console.log(response);
+
+        if (response.status === 200) {
+            navigate('/signin');
+        }
     }
 
     return (
@@ -57,8 +58,6 @@ const Signup = () => {
                 <div className='registration-form-section'>
                     <Stack spacing={3} className='registration-inputs'>
                         <Input placeholder='Username' size='md' value={username} onChange={e => setUsername(e.target.value)}/>
-                        <Input placeholder='First Name' size='md' value={firstname} onChange={e => setFirstname(e.target.value)}/>
-                        <Input placeholder='Last Name' size='md' value={lastname} onChange={e => setLastname(e.target.value)}/>
                         <Input placeholder='Email' size='md' value={email} onChange={e => setEmail(e.target.value)}/>
                         {isEmailConfInvalid ? <p className='registration-error-message'>Please enter a valid email</p> : null}
                         <Input type='password' placeholder='Password' size='md' value={password} onChange={e => setPassword(e.target.value)}/>

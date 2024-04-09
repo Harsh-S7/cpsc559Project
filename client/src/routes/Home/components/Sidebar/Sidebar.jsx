@@ -39,7 +39,7 @@ const Sidebar = (props) => {
                         <MenuItem
                             onClick={() => {
                                 localStorage.clear()
-                                navigate('/registration')
+                                navigate('/signin')
                             }}
                         >
                             Log out

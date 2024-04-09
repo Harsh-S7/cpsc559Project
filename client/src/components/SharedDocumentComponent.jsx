@@ -57,7 +57,25 @@ const SharedDocumentComponent = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 'bold', background: '#0D1117', width: "100%", height: "fit-content", color: "white", padding: "2rem" }}>Document: {docName}</h2>
+      <div style={{ 
+          fontSize: '24px', 
+          fontWeight: 'bold', 
+          background: '#0D1117', 
+          width: "100%", 
+          height: "fit-content", 
+          color: "white", 
+          padding: "2rem", 
+          display: "flex",
+          justifyContent: "space-between" // Add this line
+      }}>
+          <h2>
+            Document: {docName}
+          </h2>
+          <div style={{ alignSelf: "flex-end", fontSize: '18px', fontWeight: 'normal' }}>
+            @{localStorage.getItem('username')}
+          </div>
+      </div>
+      
       <MDEditor
         className='markdown-editor'
         value={content}
