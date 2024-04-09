@@ -118,13 +118,12 @@ app.get("/server-down", (req: Request, res: Response) => {
 app.post("/primary-update", (req: Request, res: Response) => {
   const primary = req.body.id;
 
-  if (primary) {
+  if (primary != primaryServerUrl) {
     primaryServerUrl = primary;
     res.status(200).send('Primary server updated');
   }
   else {
-    res.status(400).send('Primary server URL not provided');
-    throw new Error('Primary server URL not provided');
+    res.status(202).send('Primary server already set');
   }
 });
 
