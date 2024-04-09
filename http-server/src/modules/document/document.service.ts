@@ -18,6 +18,12 @@ export class DocumentService {
     return DocumentRepository.getDocumentsByUser(username);
   }
 
+  static async getDocumentSharedWithUser(username: string): Promise<DocumentRecord[]> {
+    const user = await UserRepository.getUser(username);
+    if (!user) throw new Error("user not found");
+    return DocumentRepository.getDocumentSharedWithUser(username);
+  }
+
   static async getDocument(id: string): Promise<DocumentRecord> {
     const doc = await DocumentRepository.getDocument(id);
     if (!doc) throw new Error();
@@ -45,5 +51,23 @@ export class DocumentService {
       shared: [],
     };
     await DocumentRepository.createDocument(doc);
+  }
+  
+  static async deleteDocument(id: string) {
+    const doc = await DocumentRepository.getDocument(id);
+    if (!doc) throw new Error("doc not found");
+    await DocumentRepository.deleteDocument(id);
+  }
+
+  static async shareDocument(id: string, shared: string[]) {
+    const doc = await DocumentRepository.getDocument(id);
+    if (!doc) throw new Error("doc not found");
+    await DocumentRepository.shareDocument(id, shared);
+  }
+
+  static async verifyAccess(id: string, user: string) {
+    const doc = await DocumentRepository.getDocument(id);
+    if (!doc) throw new Error("doc not found");
+    await DocumentRepository.verifyAccess(id, user);
   }
 }
