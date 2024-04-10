@@ -19,10 +19,16 @@ import './Dashboard.scss'
 import { createNewDocument } from '../../../../../lib/utils'
 
 const Dashboard = (props) => {
+  // useToast is a hook provided by Chakra UI to show toast notifications UI component.
   const toast = useToast();
+
+  // state variable to manage the document name
   const [documentName, setDocumentName] = React.useState('');
+
+  // useDisclosure is a hook provided by Chakra UI to manage the open and close state of a modal
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  // function to handle the creation of a new document
   const handleNewDocument = async () => {
     const response = await createNewDocument(documentName, localStorage.getItem('username'));
     if (response instanceof Error) {
@@ -41,6 +47,7 @@ const Dashboard = (props) => {
     onClose();
   }
 
+  // Modal to create a new document
   const newDocumentModal = (
     <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -60,6 +67,7 @@ const Dashboard = (props) => {
       </Modal>
   )
 
+  // render the component
   return (
     <div className='dashboard-container'>
       <Header

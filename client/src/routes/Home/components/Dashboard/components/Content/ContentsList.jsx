@@ -21,13 +21,21 @@ import { deleteDocument, shareDocument } from '../../../../../../../lib/utils';
 import './ContentsList.scss'
 
 const ContentsList = (props) => {
+  // useNavigate is a hook provided by react-router-dom to navigate to different routes
   const navigate = useNavigate()
+
+  // useToast is a hook provided by Chakra UI to show toast notifications UI component.
   const toast = useToast();
+
+  // useDisclosure is a hook provided by Chakra UI to manage the open and close state of a modal
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // state variables to manage the username and sharingDocumentId
   const [username, setUsername] = React.useState('');
   const [usernames, setUsernames] = React.useState([]);
   const [sharingDocumentId, setSharingDocumentId] = React.useState('');
 
+  // function to handle the deletion of a document
   const handleDeleteDocument = async (documentId) => {
     const response = await deleteDocument(documentId);
     if (response instanceof Error) {
@@ -51,6 +59,7 @@ const ContentsList = (props) => {
     props.fetchDocuments();
   }
 
+  // function to handle the sharing of a document
   const handleShareDocument = async (documentId) => {
     const response = await shareDocument(documentId, usernames);
     if (response instanceof Error) {
@@ -73,6 +82,7 @@ const ContentsList = (props) => {
     });
   }
 
+  // Modal to share a document
   const shareModal = (
     <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -109,6 +119,7 @@ const ContentsList = (props) => {
       </Modal>
   )
 
+  // function to render the document item
   const documentItem = (document) => {
     return (
       <Box
@@ -154,6 +165,7 @@ const ContentsList = (props) => {
     )
   }
 
+  // render the components
   return (
     <div className='contents-list-container'>
       <Box className='stack-title'>

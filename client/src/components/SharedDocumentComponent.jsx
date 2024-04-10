@@ -9,11 +9,18 @@ import { getDocumentById } from '../../lib/utils';
 import './SharedDocumentComponent.scss';
 
 const SharedDocumentComponent = () => {
+    // useParams is a hook provided by react-router-dom to access the parameters of the current route. 
+    // In this case, we are accessing the docId parameter from the route '/editor/:docId'
     const { docId } = useParams();
+
+    // state variables to manage the document name, the document object, and the content of the document
     const [docName, setDocName] = useState('');
     const [doc, setDoc] = useState(null);
     const [content, setContent] = useState('');
 
+    // useEffect hook to fetch the document by the docId
+    // The document name is set in the state variable docName
+    // fetchDocument function is called only once when the component is mounted.
     useEffect(() => {
         const fetchDocument = async () => {
             const response = await getDocumentById(docId);
@@ -27,7 +34,11 @@ const SharedDocumentComponent = () => {
         fetchDocument();
     },[]);
 
+    // useEffect hook to connect to the shared document using Yjs
+    // The document name is used to connect to the shared document
+    // The content of the document is updated whenever there is a change in the shared document
     useEffect(() => {
+        if (docName === '') return;
         const ydoc = new Y.Doc();
         console.log('Connecting to document:', docName);
         const wsProvider = new WebsocketProvider(import.meta.env.VITE_WEBSOCKET_URL, docName, ydoc);
@@ -46,6 +57,7 @@ const SharedDocumentComponent = () => {
         };
     }, [docName]);
 
+    // function to update the content of the shared document
     const updateDocument = (newContent) => {
         if (doc) {
             const ytext = doc.getText('sharedText');
@@ -55,6 +67,7 @@ const SharedDocumentComponent = () => {
         }
     };
 
+    // render the components
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div style={{ 

@@ -7,12 +7,14 @@ import { useNavigate } from 'react-router-dom'
 
 import './Sidebar.scss'
 
+// array of buttons text
 const buttonsText = [
     "Recents",
     "My Documents",
     "Shared with me",
 ]
 
+// array of buttons icons
 const buttonsIcons = [
     mdiHistory,
     mdiFolder,
@@ -20,12 +22,15 @@ const buttonsIcons = [
 ]
 
 const Sidebar = (props) => {
+    // useNavigate is a hook provided by react-router-dom to navigate to different routes
     const navigate = useNavigate()
 
+    // function to minimize the sidebar
     const handleMinimize = () => {
         props.setIsSidebarOpen(!props.isSidebarOpen)
     }
 
+    // render the component
     return (
       <div className={`sidebar-layout ${!props.isSidebarOpen ? 'minimized' : ''}`}>
           {props.isSidebarOpen ? (

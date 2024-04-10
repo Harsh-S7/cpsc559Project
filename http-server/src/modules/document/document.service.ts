@@ -8,6 +8,8 @@ import {
 import { UserRepository } from "../user/user.repository";
 
 export class DocumentService {
+  // handle all business logic, please handle all logic here
+
   static async getAllDocument(): Promise<DocumentRecord[]> {
     return await DocumentRepository.getAllDocuments();
   }
@@ -18,7 +20,9 @@ export class DocumentService {
     return DocumentRepository.getDocumentsByUser(username);
   }
 
-  static async getDocumentSharedWithUser(username: string): Promise<DocumentRecord[]> {
+  static async getDocumentSharedWithUser(
+    username: string,
+  ): Promise<DocumentRecord[]> {
     const user = await UserRepository.getUser(username);
     if (!user) throw new Error("user not found");
     return DocumentRepository.getDocumentSharedWithUser(username);
@@ -32,7 +36,7 @@ export class DocumentService {
 
   static async modifyDocument(id: string, doc: PutDocumentReqDto) {
     const newDoc: DocumentRecord = {
-      id: new ObjectId(doc.id),
+      id: doc.id,
       name: doc.name,
       shared: doc.shared,
       owner: doc.owner,
@@ -44,15 +48,19 @@ export class DocumentService {
   }
 
   static async createDocument(newDoc: PostDocumentReqDto) {
+    const newId = newDoc.name + newDoc.owner;
+    //+ (await this.getDocumentByUser(newDoc.owner)).length;
+    console.log(`newid: ${newId}`);
+
     const doc: DocumentRecord = {
-      id: new ObjectId(),
+      id: newId,
       name: newDoc.name,
       owner: newDoc.owner,
       shared: [],
     };
     await DocumentRepository.createDocument(doc);
   }
-  
+
   static async deleteDocument(id: string) {
     const doc = await DocumentRepository.getDocument(id);
     if (!doc) throw new Error("doc not found");

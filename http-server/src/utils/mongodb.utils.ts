@@ -8,7 +8,9 @@ export const collections: {
   docs?: mongodb.Collection<DocumentSchema>;
 } = {};
 
+// use to setup mongodb
 export async function mongdoDbSetup() {
+  // attempt connecting
   const mongodbUrl = process.env.MONGO_CONN;
   const mongoDbName = process.env.MONGO_DB || "cpsc559";
 
@@ -21,6 +23,7 @@ export async function mongdoDbSetup() {
   const db = client.db(mongoDbName);
   try {
     db.createCollection(MongoDbCollectionsEnum.users);
+    // seed the database
     db.collection(MongoDbCollectionsEnum.users).insertOne({
       username: "root",
       email: "root@gmail.com",

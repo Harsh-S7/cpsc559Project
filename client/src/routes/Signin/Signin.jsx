@@ -7,18 +7,24 @@ import { loginUser } from '../../../lib/utils'
 import './Signin.scss'
 
 const Registration = () => {
+    // useNavigate is a hook provided by react-router-dom to navigate to different routes
     const navigate = useNavigate()
 
+    // Function to navigate to the signup page
     const toSignup = (event) => {
         event.preventDefault()
         navigate('/signup')
     }
 
+    // React.useState is a hook provided by React to manage state in functional components
+    // state variables to manage the username and password
     const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
 
+    // Validation checks
     const isLoginValid = username.length > 0 && password.length > 0;
 
+    // Function to handle the login action
     const handleLogin = async () => {
         if (!isLoginValid) {
             return;
@@ -36,6 +42,7 @@ const Registration = () => {
         }
     }
 
+    // render the component
   return (
     <React.Fragment>
         <div className='registration-hero-section'>

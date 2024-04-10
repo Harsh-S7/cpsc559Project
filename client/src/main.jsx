@@ -13,7 +13,7 @@ const theme = extendTheme({
   },
 })
 
-
+// render the app. This is the entry point of the React app
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>

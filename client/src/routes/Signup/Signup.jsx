@@ -9,19 +9,26 @@ import { createNewUser } from '../../../lib/utils'
 import './Signup.scss'
 
 const Signup = () => {
+    // useNavigate is a hook provided by react-router-dom to navigate to different routes
     const navigate = useNavigate()
+
+    // useToast is a hook provided by Chakra UI to show toast notifications UI component.
     const toast = useToast()
 
+    // React.useState is a hook provided by React to manage state in functional components
+    // state variables to manage the username, email, password and password confirmation
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [passwordConfirm, setPasswordConfirm] = React.useState('');
     const [username, setUsername] = React.useState('');
 
+    // Validation checks
     const isPasswordConfInvalid = (password.length > 0 && passwordConfirm.length > 0) && (password !== passwordConfirm);
     const emailRegex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
     const isEmailConfInvalid = !emailRegex.test(email) && email.length > 0;
     const isPasswordValid = password.length > 0 && passwordConfirm.length > 0 && password === passwordConfirm;
 
+    // Function to handle the signup action
     const handleSignup = async () => {
         if (!isPasswordValid || isEmailConfInvalid) {
             return;
@@ -46,6 +53,7 @@ const Signup = () => {
         }
     }
 
+    // render the component
     return (
         <React.Fragment>
             <div className='registration-hero-section'>
