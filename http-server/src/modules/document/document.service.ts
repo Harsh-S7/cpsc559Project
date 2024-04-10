@@ -8,6 +8,8 @@ import {
 import { UserRepository } from "../user/user.repository";
 
 export class DocumentService {
+  // handle all business logic, please handle all logic here
+
   static async getAllDocument(): Promise<DocumentRecord[]> {
     return await DocumentRepository.getAllDocuments();
   }
