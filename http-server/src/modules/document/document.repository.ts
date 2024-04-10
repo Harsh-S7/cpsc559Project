@@ -4,6 +4,7 @@ import { collections } from "../../utils/mongodb.utils";
 import { DocumentRecord } from "./dtos/document.dto";
 
 export class DocumentRepository {
+  // handle operation with mongodb here
   static async getAllDocuments(): Promise<DocumentRecord[]> {
     const docs = collections.docs!;
     const findResults = await docs.find<DocumentSchema>({}).toArray();

@@ -6,12 +6,15 @@ export const propagate = async function (
   res: Response,
   next: NextFunction,
 ) {
+  //get all variable needed
   const webSocketPort = process.env.WEB_SOCKET_PORT;
   const websocketUrl = `http://localhost:${webSocketPort}`;
+  // check if primary with replica manager
   const isPrimary = (await axios.get(websocketUrl + "/isPrimary")).data
     .isPrimary;
   if (isPrimary) {
     // do propagation if is primary
+    // crafting requests
     const clone1 = process.env.CLONE1;
     const clone2 = process.env.CLONE2;
     const clone1_pack = {
@@ -26,10 +29,11 @@ export const propagate = async function (
     };
     console.log(clone1_pack);
     console.log(clone2_pack);
-    try{
+    // propagation happens here
+    try {
       await axios(clone1_pack);
       await axios(clone2_pack);
-    }catch(e){
+    } catch (e) {
       console.log("one or more http replicas failed");
     }
   }
