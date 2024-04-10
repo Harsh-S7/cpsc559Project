@@ -4,6 +4,7 @@ import { ChevronRightIcon } from '@chakra-ui/icons'
 
 import './Header.scss'
 
+// Header component of the Dashboard
 const Header = (props) => {
 
   return (
